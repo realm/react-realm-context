@@ -1,0 +1,36 @@
+{
+  "name": "react-realm-context",
+  "version": "0.1.0",
+  "description": "Components that simplifies using Realm with React.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha --opts config/mocha.opts"
+  },
+  "main": "build/index.js",
+  "author": {
+    "name": "Realm",
+    "email": "help@realm.io",
+    "url": "https://realm.io"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/mocha": "^5.2.0",
+    "@types/react": "^16.3.14",
+    "@types/react-test-renderer": "^16.0.1",
+    "create-react-app": "^1.5.2",
+    "hoist-non-react-statics": "^2.5.0",
+    "mocha": "^5.1.1",
+    "react": "^16.3.2",
+    "react-test-renderer": "^16.3.2",
+    "realm": "^2.5.0",
+    "ts-node": "^6.0.3",
+    "typescript": "^2.8.3"
+  },
+  "peerDependencies": {
+    "react": ">=16.3",
+    "realm": ">=2"
+  },
+  "dependencies": {
+    "@types/node": "^10.1.0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "outDir": "./build",
+    "jsx": "react",
+    "noImplicitAny": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}
