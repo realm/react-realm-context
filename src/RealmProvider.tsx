@@ -27,10 +27,6 @@ export const generateRealmProvider = (
 
     // TODO: Remember propTypes
 
-    public componentDidMount() {
-      // Start listening to the Realm
-    }
-
     public componentWillUnmount() {
       if (this.realm) {
         this.realm.close();

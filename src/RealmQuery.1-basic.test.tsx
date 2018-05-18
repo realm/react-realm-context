@@ -72,15 +72,14 @@ describe('RealmQuery (basic)', () => {
           {({ realm, results }) => {
             if (step === 0) {
               step++;
-              assert(results.length === 0);
+              assert.equal(results.length, 0);
               // First the function is called when no persons exists
             } else if (step === 2) {
               step++;
               assert.equal(results.length, 1);
               finish(realm);
             } else {
-              const err = new Error('RealmQuery rendered unexpectedly');
-              done(err);
+              done(new Error(`RealmQuery rendered unexpectedly (step = ${step})`));
             }
             return null;
           }}

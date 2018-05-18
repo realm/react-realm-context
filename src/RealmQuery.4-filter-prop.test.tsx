@@ -72,7 +72,7 @@ describe('RealmQuery (filter prop)', () => {
                   // We're done!
                   done();
                 } else {
-                  done(new Error('RealmQuery rendered unexpectedly'));
+                  done(new Error(`RealmQuery rendered unexpectedly (step = ${step})`));
                 }
                 return null;
               }}
