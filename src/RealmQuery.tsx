@@ -6,12 +6,13 @@ import { IRealmContext, RealmConsumer } from '.';
 type Value<T> = { results: Realm.Results<T>, realm: Realm };
 type QueryChild<T> = (value: Value<T>) => React.ReactChild;
 
+export type Filtering = string | any[];
 export type Sorting = string | Realm.SortDescriptor | Realm.SortDescriptor[];
 
 export interface IRealmQueryProps<T> {
   children: QueryChild<T>;
   type: string | Realm.ObjectSchema | Function;
-  filter?: string | any[];
+  filter?: Filtering;
   sort?: Sorting;
 }
 
@@ -23,6 +24,9 @@ export const generateRealmQuery = (
 
     private realm?: Realm;
     private results?: Realm.Results<T>;
+
+    private currentFilter: Filtering;
+    private currentSort: Sorting;
 
     // TODO: Add propTypes for non-TypeScript users
     // TODO: Allow the query to take a custom consumer as a prop
@@ -72,6 +76,15 @@ export const generateRealmQuery = (
 
     private getResults(realm: Realm) {
       const { type, filter, sort } = this.props;
+      // If the filter or sort changed since last time - regenerate the results
+      if (this.currentFilter !== filter || this.currentSort !== sort) {
+        this.forgetResults();
+        this.currentFilter = filter;
+        this.currentSort = sort;
+      } else if (this.results) {
+        return this.results;
+      }
+
       // Start with the type
       let results = realm.objects<T>(type);
       // Filtering
