@@ -3,6 +3,11 @@
 More React'y API for realm.js, handling opening and closing the Realm and providing a
 context for child components to read from and write to the database.
 
+## Works as a context provider or render-prop component
+
+It will check the type of the children passed as prop and either render
+it normally or pass the context render-prop style.
+
 ## How it's used
 
 ```
@@ -92,3 +97,6 @@ export const PersonList = () => (
 ## Initialize data
 
 Its easy to initialize the database when its opened for the first time.
+(using Realm.empty)
+
+## Will update on any change until you specify what you're looking for

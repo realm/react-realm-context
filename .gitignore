@@ -1,2 +1,6 @@
 build
 node_modules
+
+# Realm files
+*.realm
+*.realm.management

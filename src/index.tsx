@@ -1,7 +1,11 @@
 import * as React from 'react';
 import * as Realm from 'realm';
 
+export type RealmRenderer = (context: IRealmContext) => React.ReactNode;
+
 import { generateRealmProvider } from './RealmProvider';
+import { generateRealmConsumer } from './RealmConsumer';
+import { generateRealmQuery, Sorting } from './RealmQuery';
 
 export interface IRealmContext {
   realm: Realm;
@@ -10,8 +14,26 @@ export interface IRealmContext {
 const createRealmContext = () => {
   const { Provider, Consumer } = React.createContext<IRealmContext>(null);
   const RealmProvider = generateRealmProvider(Provider);
-  return { RealmProvider, RealmConsumer: Consumer };
+  const RealmConsumer = generateRealmConsumer(Consumer);
+  const RealmQuery = generateRealmQuery(Consumer);
+  return { RealmProvider, RealmConsumer, RealmQuery };
 };
 
-export { createRealmContext };
-export { withRealm } from './withRealm';
+// Export a function that creates Realm contexts
+export {
+  createRealmContext,
+  Sorting as RealmSorting,
+};
+
+// Create and export default RealmProvider and RealmConsumer
+const {
+  RealmProvider,
+  RealmConsumer,
+  RealmQuery
+} = createRealmContext();
+
+export {
+  RealmProvider,
+  RealmConsumer,
+  RealmQuery,
+};

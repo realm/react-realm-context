@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Components that simplifies using Realm with React.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p config/tsconfig.build.json",
     "test": "mocha --opts config/mocha.opts"
   },
   "main": "build/index.js",
