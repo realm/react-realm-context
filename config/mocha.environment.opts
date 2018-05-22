@@ -1,5 +1,4 @@
 -r ts-node/register
 --forbid-only
---watch-extensions ts,tsx
 --exit
 src/**/*.test.tsx

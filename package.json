@@ -4,7 +4,9 @@
   "description": "Components that simplifies using Realm with React.js",
   "scripts": {
     "build": "tsc -p config/tsconfig.build.json",
-    "test": "mocha --opts config/mocha.opts"
+    "test": "mocha --opts config/mocha.opts",
+    "test:integration": "mocha --opts config/mocha.integration.opts",
+    "test:in-environment": "mocha --opts config/mocha.environment.opts"
   },
   "main": "build/index.js",
   "author": {
@@ -14,15 +16,18 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
+    "@types/fs-extra": "^5.0.2",
     "@types/mocha": "^5.2.0",
     "@types/react": "^16.3.14",
     "@types/react-test-renderer": "^16.0.1",
     "create-react-app": "^1.5.2",
+    "fs-extra": "^6.0.1",
     "hoist-non-react-statics": "^2.5.0",
     "mocha": "^5.1.1",
+    "prepend-transform": "0.0.1015",
     "react": "^16.3.2",
     "react-test-renderer": "^16.3.2",
-    "realm": "^2.5.0",
+    "realm": "^2.6.0",
     "ts-node": "^6.0.3",
     "typescript": "^2.8.3"
   },
