@@ -2,3 +2,4 @@
 --forbid-only
 --exit
 integration-tests/environments.test.ts
+integration-tests/examples.test.ts
