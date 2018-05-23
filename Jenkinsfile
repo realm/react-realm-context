@@ -8,12 +8,17 @@ node('docker') {
   }
 
   stage('Install, build and package') {
-    sh 'npm install'
-    sh 'npm run build'
-    sh 'npm pack'
+    image = buildDockerEnv("ci/react-realm-context")
+    image.inside("-e HOME=${env.WORKSPACE} -v /etc/passwd:/etc/passwd:ro") {
+      sh 'npm install'
+      sh 'npm run build'
+      sh 'npm pack'
+    }
   }
 
   stage('Test') {
-    sh 'npm test'
+    image.inside("-e HOME=${env.WORKSPACE} -v /etc/passwd:/etc/passwd:ro") {
+      sh 'npm test'
+    }
   }
 }
