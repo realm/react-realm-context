@@ -1,18 +1,18 @@
 import React from 'react';
 
-import { CarRealmConsumer } from './CarRealm';
-import { PersonRealmConsumer } from './PersonRealm';
+import { CarsRealmConsumer } from './CarsRealm';
+import { PersonsRealmConsumer } from './PersonsRealm';
 
 export const SomeChildComponent = () => (
-  <CarRealmConsumer>
+  <CarsRealmConsumer>
     {({ realm: carRealm }) => (
-      <PersonRealmConsumer>
+      <PersonsRealmConsumer>
         {({ realm: personRealm }) => {
-          const isCarRealmReady = !carRealm.isClosed && carRealm.empty;
-          const isPersonRealmReady = !personRealm.isClosed && personRealm.empty;
-          return `${isPersonRealmReady} ${isCarRealmReady}`;
+          const isCarsRealmReady = !carRealm.isClosed && carRealm.empty;
+          const isPersonsRealmReady = !personRealm.isClosed && personRealm.empty;
+          return `${isPersonsRealmReady} ${isCarsRealmReady}`;
         }}
-      </PersonRealmConsumer>
+      </PersonsRealmConsumer>
     )}
-  </CarRealmConsumer>
+  </CarsRealmConsumer>
 );

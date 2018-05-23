@@ -11,7 +11,7 @@ const CarSchema = {
   }
 };
 
-const CarRealmProvider = ({ children }) => (
+const CarsRealmProvider = ({ children }) => (
   <RealmProvider
     path="cars.realm"
     schema={[ CarSchema ]}
@@ -20,6 +20,6 @@ const CarRealmProvider = ({ children }) => (
 );
 
 export {
-  CarRealmProvider,
-  RealmConsumer as CarRealmConsumer,
+  CarsRealmProvider,
+  RealmConsumer as CarsRealmConsumer,
 };

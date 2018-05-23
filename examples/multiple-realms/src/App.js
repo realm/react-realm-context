@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 
-import { CarRealmProvider } from './CarRealm';
-import { PersonRealmProvider } from './PersonRealm';
+import { CarsRealmProvider } from './CarsRealm';
+import { PersonsRealmProvider } from './PersonsRealm';
 import { SomeChildComponent } from './SomeChildComponent';
 
 class App extends Component {
   render() {
     return (
-      <PersonRealmProvider>
-        <CarRealmProvider>
+      <PersonsRealmProvider>
+        <CarsRealmProvider>
           <SomeChildComponent />
-        </CarRealmProvider>
-      </PersonRealmProvider>
+        </CarsRealmProvider>
+      </PersonsRealmProvider>
     );
   }
 }

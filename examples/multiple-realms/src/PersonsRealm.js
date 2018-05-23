@@ -11,15 +11,15 @@ const PersonSchema = {
   }
 };
 
-const PersonRealmProvider = ({ children }) => (
+const PersonsRealmProvider = ({ children }) => (
   <RealmProvider
-    path="person.realm"
+    path="persons.realm"
     schema={[ PersonSchema ]}
     children={children}
   />
 );
 
 export {
-  PersonRealmProvider,
-  RealmConsumer as PersonRealmConsumer,
+  PersonsRealmProvider,
+  RealmConsumer as PersonsRealmConsumer,
 };
