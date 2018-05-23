@@ -16,6 +16,7 @@ export const generateRealmConsumer = (
   class RealmConsumer extends React.Component<IRealmConsumerProps> {
 
     // TODO: Add propTypes for non-TypeScript users
+    // TODO: Complain if used without a Realm Provider
 
     public render() {
       return <WrappedConsumer>{this.renderContext}</WrappedConsumer>;
