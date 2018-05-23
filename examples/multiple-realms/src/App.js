@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 
-import { PersonRealmProvider } from './PersonRealm';
 import { CarRealmProvider } from './CarRealm';
+import { PersonRealmProvider } from './PersonRealm';
+import { SomeChildComponent } from './SomeChildComponent';
 
 class App extends Component {
   render() {
