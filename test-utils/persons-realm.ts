@@ -10,7 +10,7 @@ export const schema: Realm.ObjectSchema[] = [
     name: 'Person',
     properties: {
       name: 'string',
-      age: 'int',
+      age: 'int?',
     }
   }
 ];

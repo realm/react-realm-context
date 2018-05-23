@@ -18,10 +18,11 @@ describe('realm-realm-context', () => {
       // Create a context
       const result = createRealmContext();
       // Assert something about it
-      assert.equal(Object.keys(result).length, 3);
-      const { RealmProvider, RealmConsumer, RealmQuery } = result;
+      assert.equal(Object.keys(result).length, 4);
+      const { RealmProvider, RealmConsumer, RealmInitializer, RealmQuery } = result;
       assert(RealmProvider);
       assert(RealmConsumer);
+      assert(RealmInitializer);
       assert(RealmQuery);
     });
 
