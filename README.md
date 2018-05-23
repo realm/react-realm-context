@@ -7,6 +7,10 @@ A more React'y experience of Realm:
   database.
 - Adds and removes listeners on results with the component lifecycle which re-renders components when data change.
 
+**Please note:** This package uses Realm JS and it therefore has the same limitation that it needs access to the device
+file system and therefore cannot run in a "regular" web-browser. This package is meant to be used in an environment like
+Node.js, React Native or Electron where the JavaScript thread has access to the file system.
+
 ## Installation
 
 Install using NPM (or yarn) - if you already have React and Realm (both are peer dependencies) installed
@@ -30,36 +34,130 @@ best documentation available.
 
 ## Using it
 
+### Default local Realm via the default context with [render-prop](https://reactjs.org/docs/render-props.html)
+
 ```
-// App.js
+import React, { Component } from 'react';
+import { RealmProvider } from 'react-realm-context';
+
+export const App = () => (
+  <RealmProvider schema={[{ name: 'Person', properties: { name: 'string' } }]}>
+    {({ realm }) => {
+      if (realm.empty) {
+        realm.write(() => {
+          realm.create('Person', { name: 'John Doe' });
+        });
+      }
+      return realm.objects('Person').map(person => person.name).join(', ');
+    }}
+  </RealmProvider>
+);
+
+```
+
+This will open the default local Realm using the default `RealmProvider` exported by the package.
+
+See `/examples/simple-render-props` for a complete example.
+
+### Default local Realm via the default context
+
+```
+import React, { Component } from 'react';
+import { RealmProvider } from 'react-realm-context';
+
+import { SomeDeeplyNestedComponent } from './SomeDeeplyNestedComponent';
+
+export const App = () => (
+  <RealmProvider schema={[{ name: 'Person', properties: { name: 'string' } }]}>
+    <SomeDeeplyNestedComponent />
+  </RealmProvider>
+);
+```
+
+```
+// SomeDeeplyNestedComponent.js
 
 import React, { Component } from 'react';
-import { RealmProvider, RealmConsumer } from 'react-realm-context';
+import { RealmConsumer } from 'react-realm-context';
 
-import { PersonList } from './PersonList';
-
-export class App from Component {
-  render() {
-    return (
-      <RealmProvider>
-        <PersonList />
-      </RealmProvider>
-    );
-  }
-}
+export const SomeDeeplyNestedComponent = () => (
+  <RealmConsumer>
+    {({ realm }) => {
+      if (realm.empty) {
+        realm.write(() => {
+          realm.create('Person', { name: 'John Doe' });
+        });
+      }
+      return realm.objects('Person').map(person => person.name).join(', ');
+    }}
+  </RealmConsumer>
+);
 ```
 
----
+This will open the default local Realm using the default `RealmProvider` exported by the package and pass the open Realm
+to any (potentially deeply nested) `RealmConsumer`s in its component sub-tree.
 
-## Initialize data
+See `/examples/simple-context` for a complete example.
 
-Its easy to initialize the database when its opened for the first time.
-(using Realm.empty)
+### Default local Realm via the default context, RealmInitializer and RealmQuery
 
-## Will update on any change until you specify what you're looking for
+Initializing data if the Realm is empty and querying for data are common patterns that the package has components for:
+- Use the `RealmInitializer` to create objects if the Realm is empty.
+- Use the `RealmQuery` to query for objects somewhere in a `RealmProvider` sub-tree.
 
-## Where not to use it
+```
+import React, { Component } from 'react';
+import { RealmProvider } from 'react-realm-context';
 
-Don't use this in a "regular browser"
+import { SomeDeeplyNestedComponent } from './SomeDeeplyNestedComponent';
 
-##
+export const App = () => (
+  <RealmProvider schema={[{ name: 'Person', properties: { name: 'string' } }]}>
+    <RealmInitializer>
+      {({ realm }) => {
+        realm.create('Person', { name: 'John Doe' });
+      }}
+    </RealmInitializer>
+    <SomeDeeplyNestedComponent />
+  </RealmProvider>
+);
+```
+
+```
+// SomeDeeplyNestedComponent.js
+
+import React, { Component } from 'react';
+import { RealmQuery } from 'react-realm-context';
+
+export const SomeDeeplyNestedComponent = () => (
+  <RealmQuery type="Person">
+    {({ results }) => results.map(person => person.name).join(', ')}
+  </RealmQuery>
+);
+```
+
+This will open the default local Realm using the default `RealmProvider`, use the `RealmInitializer` to create a person
+named "John Doe" if no data exists when opening the Realm and use the `RealmQuery` to render the persons names.
+
+See `/examples/initializer-and-query` for a complete example.
+
+## Code of Conduct
+
+This project adheres to the Contributor Covenant [code of conduct](https://realm.io/conduct/).
+By participating, you are expected to uphold this code. Please report unacceptable behavior to [info@realm.io](mailto:info+conduct@realm.io).
+
+## License
+
+Realm React Context is published under the Apache 2.0 license.
+
+**This product is not being made available to any person located in Cuba, Iran,
+North Korea, Sudan, Syria or the Crimea region, or to any other person that is
+not eligible to receive the product under U.S. law.**
+
+## Feedback
+
+**_If you use Realm and are happy with it, all we ask is that you please consider sending out a tweet mentioning [@realm](https://twitter.com/realm) to share your thoughts_**
+
+**_And if you don't like it, please let us know what you would like improved, so we can fix it!_**
+
+![analytics](https://ga-beacon.appspot.com/UA-50247013-2/react-realm-context/README?pixel)
