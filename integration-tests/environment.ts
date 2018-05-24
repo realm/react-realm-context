@@ -6,7 +6,7 @@ import * as stream from 'stream';
 import pt from 'prepend-transform';
 
 const ENVIRONMENTS_PATH = path.resolve(__dirname, 'environments');
-const NVM_PATH = path.resolve(os.homedir(), '.nvm/nvm.sh');
+const NVM_PATH = path.resolve(process.env.NVM_DIR, 'nvm.sh');
 const PROJECT_PATH = path.resolve(__dirname, '..');
 
 if (!fs.existsSync(NVM_PATH)) {

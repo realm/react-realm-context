@@ -16,6 +16,7 @@ node('docker') {
       run 'npm install'
       run 'npm run build'
       run 'npm pack'
+      archiveArtifacts 'react-realm-context-*.tgz'
     }
   }
 
