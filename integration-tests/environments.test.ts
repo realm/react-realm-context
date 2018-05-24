@@ -1,7 +1,7 @@
 import { environment, IVersions } from './environment';
 
 const VERSIONS = {
-  realm: ['2.0.13', '2.6.0'],
+  realm: ['2.1.0', '2.6.0'],
   react: ['16.3.2'],
 };
 

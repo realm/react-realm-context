@@ -59,6 +59,7 @@ export const environment = (versions: IVersions) => {
 
     // Create a symbolic link of specific files into the environment
     ensureLinkIntoEnvironment(environmentPath, 'package.json');
+    ensureLinkIntoEnvironment(environmentPath, 'tsconfig.json');
     ensureLinkIntoEnvironment(environmentPath, 'config');
     ensureLinkIntoEnvironment(environmentPath, 'src');
     // Copy the package-lock to ensure versions are locked down but it doesn't get mutated

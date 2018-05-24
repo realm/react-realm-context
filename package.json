@@ -34,7 +34,7 @@
     "prettier": "^1.12.1",
     "react": "^16.3.2",
     "react-test-renderer": "^16.3.2",
-    "realm": "^2.6.0",
+    "realm": "^2.1.0",
     "ts-node": "^6.0.3",
     "tslint": "^5.10.0",
     "tslint-config-prettier": "^1.13.0",
@@ -45,6 +45,6 @@
   },
   "peerDependencies": {
     "react": ">=16.3",
-    "realm": ">=2"
+    "realm": ">=2.1"
   }
 }

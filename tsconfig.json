@@ -7,7 +7,8 @@
     "declaration": true
   },
   "include": [
-    "**/*.tsx",
-    "**/*.ts"
+    "src/**/*.tsx",
+    "utils/*.ts",
+    "integration-tests/*.ts"
   ]
 }

@@ -21,7 +21,7 @@ or to install Realm and React while you're at it
 
     npm install --save react-realm-context realm react
 
-**Note:** This package depends on Realm JS version 2.0.0 or above and React at version 16.3 or above, but to allow
+**Note:** This package depends on Realm JS version 2.1.0 or above and React at version 16.3 or above, but to allow
 maximum flexibility these are not direct dependencies but rather peer dependencies that needs to be installed for this
 package to function correctly.
 
