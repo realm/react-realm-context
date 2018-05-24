@@ -22,3 +22,6 @@ RUN source ~/.nvm/nvm.sh; \
     nvm install $NODE_VERSION; \
     nvm use --delete-prefix $NODE_VERSION; \
     nvm alias default $NODE_VERSION
+
+# Set the environment for the via-nvm.sh to use
+ENV NVM_DIR ~/.nvm
