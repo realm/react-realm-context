@@ -3,7 +3,7 @@
 @Library('realm-ci') _
 
 // Running in a bash shell with --login
-def run = { cmd -> sh "bash -l -c \"$cmd\"" }
+def run = { cmd -> sh "bash -c \"source /home/jenkins/.nvm/nvm.sh; $cmd\"" }
 
 node('docker') {
   stage('Checkout') {
