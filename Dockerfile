@@ -20,4 +20,5 @@ RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/${NVM_VERSION}/ins
 # Install NODE
 RUN source ~/.nvm/nvm.sh; \
     nvm install $NODE_VERSION; \
-    nvm use --delete-prefix $NODE_VERSION;
+    nvm use --delete-prefix $NODE_VERSION; \
+    nvm alias default $NODE_VERSION
