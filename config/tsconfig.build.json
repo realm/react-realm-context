@@ -1,5 +1,11 @@
 {
   "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../build"
+  },
+  "include": [
+    "../src/**/*.tsx"
+  ],
   "exclude": [
     "../src/**/*.test.tsx"
   ]

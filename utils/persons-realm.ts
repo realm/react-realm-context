@@ -11,6 +11,6 @@ export const schema: Realm.ObjectSchema[] = [
     properties: {
       name: 'string',
       age: 'int?',
-    }
-  }
+    },
+  },
 ];

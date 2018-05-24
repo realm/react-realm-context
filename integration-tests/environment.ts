@@ -2,8 +2,8 @@ import * as cp from 'child_process';
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
-import * as stream from 'stream';
 import pt from 'prepend-transform';
+import * as stream from 'stream';
 
 const ENVIRONMENTS_PATH = path.resolve(__dirname, 'environments');
 const PROJECT_PATH = path.resolve(__dirname, '..');
@@ -14,46 +14,44 @@ export interface IVersions {
 }
 
 const getEnvironmentPath = (versions: IVersions) => {
-  return path.resolve(ENVIRONMENTS_PATH, [
-    `realm-${versions.realm}`,
-    `react-${versions.react}`,
-  ].join('-'));
-}
+  return path.resolve(
+    ENVIRONMENTS_PATH,
+    [`realm-${versions.realm}`, `react-${versions.react}`].join('-'),
+  );
+};
 
-const ensureLinkIntoEnvironment = (
-  environmentPath: string,
-  p: string,
-) => {
+const ensureLinkIntoEnvironment = (environmentPath: string, p: string) => {
   fs.ensureSymlinkSync(
     path.resolve(PROJECT_PATH, p),
     path.resolve(environmentPath, p),
   );
-}
+};
 
 export const environment = (versions: IVersions) => {
   const environmentPath = getEnvironmentPath(versions);
 
   const exec = (command: string, options?: cp.ExecOptions) => {
-    cp.execSync(
-      command,
-      {
-        ...options,
-        encoding: 'buffer',
-        cwd: environmentPath,
-        shell: 'bash',
-        stdio: ['ignore', 'ignore', 'inherit']
-      }
-    );
+    cp.execSync(command, {
+      ...options,
+      encoding: 'buffer',
+      cwd: environmentPath,
+      shell: 'bash',
+      stdio: ['ignore', 'ignore', 'inherit'],
+    });
   };
 
   const remove = () => {
     if (!fs.existsSync(environmentPath)) {
-      throw new Error(`Failed to delete non-existing environment: ${JSON.stringify(versions)}`);
+      throw new Error(
+        `Failed to delete non-existing environment: ${JSON.stringify(
+          versions,
+        )}`,
+      );
     } else {
       // Delete the directory
       fs.removeSync(environmentPath);
     }
-  }
+  };
 
   const ensure = () => {
     // Create environment path if its not already created
