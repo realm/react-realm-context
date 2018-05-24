@@ -4,7 +4,8 @@
     "module": "commonjs",
     "outDir": "./build",
     "jsx": "react",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "declaration": true
   },
   "include": [
     "src/**/*.tsx"

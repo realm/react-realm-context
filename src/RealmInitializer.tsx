@@ -8,7 +8,7 @@ export interface IRealmInitializerProps {
 }
 
 export const generateRealmInitializer = (
-  WrappedConsumer: React.Consumer<IRealmContext>
+  WrappedConsumer: React.Consumer<IRealmContext>,
 ) => {
   const RealmInitializer = ({ children }: IRealmInitializerProps) => (
     <WrappedConsumer>

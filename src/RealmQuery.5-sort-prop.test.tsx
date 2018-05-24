@@ -2,12 +2,11 @@ import * as assert from 'assert';
 import * as React from 'react';
 import * as renderer from 'react-test-renderer';
 
-import { schema, IPerson } from '../utils/persons-realm';
+import { IPerson, schema } from '../utils/persons-realm';
 
 import { RealmConsumer, RealmProvider, RealmQuery, RealmSorting } from '.';
 
 describe('RealmQuery (sort prop)', () => {
-
   let tree: renderer.ReactTestRenderer;
 
   afterEach(() => {
@@ -19,7 +18,7 @@ describe('RealmQuery (sort prop)', () => {
     Realm.deleteFile({});
   });
 
-  it('will update when filter prop change', (done) => {
+  it('will update when filter prop change', done => {
     let step = 0;
 
     interface IPersonListProps {
@@ -27,17 +26,12 @@ describe('RealmQuery (sort prop)', () => {
     }
 
     class PersonList extends React.Component<{}, IPersonListProps> {
-      state: IPersonListProps = { sort: 'name' };
+      public state: IPersonListProps = { sort: 'name' };
 
-      render() {
+      public render() {
         return (
-          <RealmProvider
-            schema={schema}
-          >
-            <RealmQuery
-              type="Person"
-              sort={this.state.sort}
-            >
+          <RealmProvider schema={schema}>
+            <RealmQuery type="Person" sort={this.state.sort}>
               {({ realm, results }) => {
                 if (step === 0) {
                   step++;
@@ -81,7 +75,11 @@ describe('RealmQuery (sort prop)', () => {
                   // We're done!
                   done();
                 } else {
-                  done(new Error(`RealmQuery rendered unexpectedly (step = ${step})`));
+                  done(
+                    new Error(
+                      `RealmQuery rendered unexpectedly (step = ${step})`,
+                    ),
+                  );
                 }
                 return null;
               }}
@@ -91,7 +89,7 @@ describe('RealmQuery (sort prop)', () => {
       }
     }
 
-    tree = renderer.create((<PersonList />));
+    tree = renderer.create(<PersonList />);
     // Asserting the tree matches the string which was returned
     assert.equal(tree.toJSON(), null);
   });

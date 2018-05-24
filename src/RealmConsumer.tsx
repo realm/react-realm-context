@@ -3,18 +3,16 @@ import * as Realm from 'realm';
 
 import { IRealmContext } from '.';
 
-type ConsumerChild = (context: IRealmContext) => React.ReactChild;
+export type ConsumerChild = (context: IRealmContext) => React.ReactChild;
 
 export interface IRealmConsumerProps {
   children: ConsumerChild;
 }
 
 export const generateRealmConsumer = (
-  WrappedConsumer: React.Consumer<IRealmContext>
+  WrappedConsumer: React.Consumer<IRealmContext>,
 ): React.ComponentType<IRealmConsumerProps> => {
-
   class RealmConsumer extends React.Component<IRealmConsumerProps> {
-
     // TODO: Add propTypes for non-TypeScript users
     // TODO: Complain if used without a Realm Provider
 

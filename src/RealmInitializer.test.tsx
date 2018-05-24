@@ -2,12 +2,11 @@ import * as assert from 'assert';
 import * as React from 'react';
 import * as renderer from 'react-test-renderer';
 
-import { schema, IPerson } from '../utils/persons-realm';
+import { IPerson, schema } from '../utils/persons-realm';
 
-import { RealmConsumer, RealmProvider, RealmInitializer } from '.';
+import { RealmConsumer, RealmInitializer, RealmProvider } from '.';
 
 describe('RealmInitializer', () => {
-
   let tree: renderer.ReactTestRenderer;
 
   afterEach(() => {
@@ -18,7 +17,7 @@ describe('RealmInitializer', () => {
   it('will initialize the Realm with data', () => {
     let realmReference: Realm;
 
-    tree = renderer.create((
+    tree = renderer.create(
       <RealmProvider schema={schema}>
         <RealmInitializer>
           {({ realm }) => {
@@ -29,11 +28,14 @@ describe('RealmInitializer', () => {
           {({ realm }) => {
             // Hang onto the realm for the test
             realmReference = realm;
-            return realm.objects<IPerson>('Person').map(person => person.name).join(', ');
+            return realm
+              .objects<IPerson>('Person')
+              .map(person => person.name)
+              .join(', ');
           }}
         </RealmConsumer>
-      </RealmProvider>
-    ));
+      </RealmProvider>,
+    );
 
     // Asserting the tree matches the string which was returned
     assert.equal(tree.toJSON(), 'Bobby Boy');

@@ -3,16 +3,15 @@ import * as Realm from 'realm';
 
 import { IRealmContext } from '.';
 
-type RealmRenderer = (context: IRealmContext) => React.ReactChild;
+export type RealmRenderer = (context: IRealmContext) => React.ReactChild;
 
 export interface IRealmProviderProps extends Realm.Configuration {
   children: React.ReactNode | RealmRenderer;
 }
 
 export const generateRealmProvider = (
-  WrappedProvider: React.Provider<IRealmContext>
+  WrappedProvider: React.Provider<IRealmContext>,
 ): React.ComponentClass<IRealmProviderProps> => {
-
   class RealmProvider extends React.Component<IRealmProviderProps> {
     private realm: Realm;
 

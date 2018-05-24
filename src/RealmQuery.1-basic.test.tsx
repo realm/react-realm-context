@@ -2,12 +2,11 @@ import * as assert from 'assert';
 import * as React from 'react';
 import * as renderer from 'react-test-renderer';
 
-import { schema, IPerson } from '../utils/persons-realm';
+import { IPerson, schema } from '../utils/persons-realm';
 
 import { RealmConsumer, RealmProvider, RealmQuery } from '.';
 
 describe('RealmQuery (basic)', () => {
-
   let tree: renderer.ReactTestRenderer;
 
   afterEach(() => {
@@ -15,17 +14,17 @@ describe('RealmQuery (basic)', () => {
     Realm.deleteFile({});
   });
 
-  it('will pass results as prop', (done) => {
-    let called = false;
-    tree = renderer.create((
+  it('will pass results as prop', done => {
+    const called = false;
+    tree = renderer.create(
       <RealmProvider schema={schema}>
         <RealmQuery type="Person">
           {({ results }) => {
             return 'hi from render prop!';
           }}
         </RealmQuery>
-      </RealmProvider>
-    ));
+      </RealmProvider>,
+    );
     // Asserting the tree matches the string which was returned
     assert.equal(tree.toJSON(), 'hi from render prop!');
     process.nextTick(() => {
@@ -33,7 +32,7 @@ describe('RealmQuery (basic)', () => {
     });
   });
 
-  it('will work together with a Consumer', (done) => {
+  it('will work together with a Consumer', done => {
     let step = 0;
 
     const finish = (realm: Realm) => {
@@ -47,7 +46,7 @@ describe('RealmQuery (basic)', () => {
       });
     };
 
-    tree = renderer.create((
+    tree = renderer.create(
       <RealmProvider schema={schema}>
         <RealmConsumer>
           {({ realm }) => {
@@ -79,13 +78,15 @@ describe('RealmQuery (basic)', () => {
               assert.equal(results.length, 1);
               finish(realm);
             } else {
-              done(new Error(`RealmQuery rendered unexpectedly (step = ${step})`));
+              done(
+                new Error(`RealmQuery rendered unexpectedly (step = ${step})`),
+              );
             }
             return null;
           }}
         </RealmQuery>
-      </RealmProvider>
-    ));
+      </RealmProvider>,
+    );
     // Asserting the tree matches the string which was returned
     assert.equal(tree.toJSON(), null);
   });

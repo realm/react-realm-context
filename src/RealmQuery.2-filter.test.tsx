@@ -2,12 +2,11 @@ import * as assert from 'assert';
 import * as React from 'react';
 import * as renderer from 'react-test-renderer';
 
-import { schema, IPerson } from '../utils/persons-realm';
+import { IPerson, schema } from '../utils/persons-realm';
 
 import { RealmConsumer, RealmProvider, RealmQuery } from '.';
 
 describe('RealmQuery (filter)', () => {
-
   let tree: renderer.ReactTestRenderer;
 
   afterEach(() => {
@@ -19,11 +18,11 @@ describe('RealmQuery (filter)', () => {
     Realm.deleteFile({});
   });
 
-  it('will update, create objects and filter out when changed', (done) => {
+  it('will update, create objects and filter out when changed', done => {
     let step = 0;
     let alice: IPerson;
 
-    tree = renderer.create((
+    tree = renderer.create(
       <RealmProvider schema={schema}>
         <RealmQuery type="Person" filter="age > 30">
           {({ realm, results }) => {
@@ -67,13 +66,15 @@ describe('RealmQuery (filter)', () => {
               // We're done!
               done();
             } else {
-              done(new Error(`RealmQuery rendered unexpectedly (step = ${step})`));
+              done(
+                new Error(`RealmQuery rendered unexpectedly (step = ${step})`),
+              );
             }
             return null;
           }}
         </RealmQuery>
-      </RealmProvider>
-    ));
+      </RealmProvider>,
+    );
     // Asserting the tree matches the string which was returned
     assert.equal(tree.toJSON(), null);
   });

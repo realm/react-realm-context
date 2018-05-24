@@ -1,14 +1,13 @@
 import * as assert from 'assert';
-import * as util from 'util';
 import * as React from 'react';
-import * as Realm from 'realm';
 import * as renderer from 'react-test-renderer';
+import * as Realm from 'realm';
+import * as util from 'util';
 
-import { createRealmContext, RealmProvider, RealmConsumer } from '.';
+import { createRealmContext, RealmProvider as DefaultRealmProvider } from '.';
 
 describe('realm-realm-context', () => {
   describe('createRealmContext', () => {
-
     afterEach(() => {
       // Delete the default file after the tests
       Realm.deleteFile({ path: Realm.defaultPath });
@@ -19,7 +18,12 @@ describe('realm-realm-context', () => {
       const result = createRealmContext();
       // Assert something about it
       assert.equal(Object.keys(result).length, 4);
-      const { RealmProvider, RealmConsumer, RealmInitializer, RealmQuery } = result;
+      const {
+        RealmProvider,
+        RealmConsumer,
+        RealmInitializer,
+        RealmQuery,
+      } = result;
       assert(RealmProvider);
       assert(RealmConsumer);
       assert(RealmInitializer);
@@ -28,9 +32,9 @@ describe('realm-realm-context', () => {
 
     it('calls any function passed as the children prop', () => {
       const { RealmProvider, RealmConsumer } = createRealmContext();
-      const tree = renderer.create((
+      const tree = renderer.create(
         <RealmProvider>
-          {(props) => {
+          {props => {
             // Assert exactly 1 properties passed through props
             assert.equal(Object.keys(props).length, 1);
             // Assert that a Realm is passed as property
@@ -38,8 +42,8 @@ describe('realm-realm-context', () => {
             // Signal that the children prop callback was called
             return 'hi from render prop!';
           }}
-        </RealmProvider>
-      ));
+        </RealmProvider>,
+      );
       // Asserting the tree matches the string which was returned
       assert.equal(tree.toJSON(), 'hi from render prop!');
       tree.unmount();
@@ -49,10 +53,10 @@ describe('realm-realm-context', () => {
       // Create a context
       const { RealmProvider, RealmConsumer } = createRealmContext();
       // Render it ..
-      const tree = renderer.create((
+      const tree = renderer.create(
         <RealmProvider>
           <RealmConsumer>
-            {(props) => {
+            {props => {
               // Assert exactly 1 properties passed through props
               assert.equal(Object.keys(props).length, 1);
               // Assert that a Realm is passed as property
@@ -61,15 +65,14 @@ describe('realm-realm-context', () => {
               return 'hi from context consumer!';
             }}
           </RealmConsumer>
-        </RealmProvider>
-      ));
+        </RealmProvider>,
+      );
       assert.equal(tree.toJSON(), 'hi from context consumer!');
       tree.unmount();
     });
   });
 
   describe('default RealmProvider & RealmConsumer', () => {
-
     afterEach(() => {
       // Delete the default file after the tests
       Realm.deleteFile({ path: Realm.defaultPath });
@@ -77,11 +80,14 @@ describe('realm-realm-context', () => {
 
     it('calls any function passed as the children prop', () => {
       let called = false;
-      const tree = renderer.create((
-        <RealmProvider>
-          {() => { called = true; return 'hi from render prop!'; }}
-        </RealmProvider>
-      ));
+      const tree = renderer.create(
+        <DefaultRealmProvider>
+          {() => {
+            called = true;
+            return 'hi from render prop!';
+          }}
+        </DefaultRealmProvider>,
+      );
       // Asserting the tree matches the string which was returned
       assert.equal(tree.toJSON(), 'hi from render prop!');
       tree.unmount();

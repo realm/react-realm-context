@@ -3,25 +3,26 @@ import * as Realm from 'realm';
 
 import { IRealmContext, RealmConsumer } from '.';
 
-type Value<T> = { results: Realm.Results<T>, realm: Realm };
-type QueryChild<T> = (value: Value<T>) => React.ReactChild;
+export interface IValue<T> {
+  results: Realm.Results<T>;
+  realm: Realm;
+}
+export type QueryChild<T> = (value: IValue<T>) => React.ReactChild;
 
-export type Filtering = string | any[];
+export type Filtering = string | any[];
 export type Sorting = string | Realm.SortDescriptor | Realm.SortDescriptor[];
 
 export interface IRealmQueryProps<T> {
   children: QueryChild<T>;
-  type: string | Realm.ObjectSchema | Function;
+  type: string | Realm.ObjectSchema;
   filter?: Filtering;
   sort?: Sorting;
 }
 
 export const generateRealmQuery = (
-  WrappedConsumer: React.Consumer<IRealmContext>
-) => {
-
-  class RealmQuery<T = any> extends React.Component<IRealmQueryProps<T>> {
-
+  WrappedConsumer: React.Consumer<IRealmContext>,
+): React.ComponentClass<IRealmQueryProps<any>> => {
+  class RealmQuery<T> extends React.Component<IRealmQueryProps<T>> {
     private realm?: Realm;
     private results?: Realm.Results<T>;
 
@@ -77,7 +78,7 @@ export const generateRealmQuery = (
     private getResults(realm: Realm) {
       const { type, filter, sort } = this.props;
       // If the filter or sort changed since last time - regenerate the results
-      if (this.currentFilter !== filter || this.currentSort !== sort) {
+      if (this.currentFilter !== filter || this.currentSort !== sort) {
         this.forgetResults();
         this.currentFilter = filter;
         this.currentSort = sort;
@@ -92,7 +93,7 @@ export const generateRealmQuery = (
         if (typeof filter === 'string') {
           results = results.filtered(filter);
         } else {
-          const [ query, ...args ] = filter;
+          const [query, ...args] = filter;
           results = results.filtered(query as string, ...args);
         }
       }
@@ -100,19 +101,18 @@ export const generateRealmQuery = (
       if (sort) {
         if (typeof sort === 'string') {
           results = results.sorted(sort);
-        } else if(Array.isArray(sort)) {
-          if (
+        } else if (Array.isArray(sort)) {
+          results =
             sort.length === 2 &&
             typeof sort[0] === 'string' &&
             typeof sort[1] === 'boolean'
-          ) {
-            results = results.sorted(sort[0] as string, sort[1] as boolean);
-          } else {
-            results = results.sorted(sort as Realm.SortDescriptor[]);
-          }
+              ? results.sorted(sort[0] as string, sort[1] as boolean)
+              : results.sorted(sort as Realm.SortDescriptor[]);
         } else {
           // TODO: Implement sorting on multiple fields
-          throw new Error('Sorting reverse or on multiple properties are not implemented yet');
+          throw new Error(
+            'Sorting reverse or on multiple properties are not implemented yet',
+          );
         }
       }
 
@@ -126,10 +126,14 @@ export const generateRealmQuery = (
       return results;
     }
 
-    private resultsChanged: Realm.CollectionChangeCallback<T> = (collection, change) => {
+    private resultsChanged: Realm.CollectionChangeCallback<T> = (
+      collection,
+      change,
+    ) => {
       // This might fire although nothing changed
       const { deletions, insertions, modifications } = change;
-      const changes = deletions.length + insertions.length + modifications.length;
+      const changes =
+        deletions.length + insertions.length + modifications.length;
       if (changes > 0) {
         this.forceUpdate();
       }
