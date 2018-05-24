@@ -22,7 +22,18 @@ node('docker') {
 
   stage('Test') {
     image.inside("-e HOME=${env.WORKSPACE} -v /etc/passwd:/etc/passwd:ro") {
-      run 'npm run test:ci'
+      try {
+        // Run the tests and report using the junit reporter
+        run 'npm run test:ci'
+      } catch (err) {
+        error "Tests failed - see results on CI"
+      } finally {
+        junit(
+          allowEmptyResults: true,
+          keepLongStdio: true,
+          testResults: 'test-results.xml'
+        )
+      }
     }
   }
 }
