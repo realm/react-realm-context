@@ -5,6 +5,7 @@
   "scripts": {
     "build": "tsc -p config/tsconfig.build.json",
     "test": "mocha --opts config/mocha.opts",
+    "test:ci": "mocha --opts config/mocha.ci.opts",
     "test:integration": "mocha --opts config/mocha.integration.opts",
     "test:in-environment": "mocha --opts config/mocha.environment.opts"
   },
@@ -25,6 +26,7 @@
     "fs-extra": "^6.0.1",
     "hoist-non-react-statics": "^2.5.0",
     "mocha": "^5.1.1",
+    "mocha-junit-reporter": "^1.17.0",
     "prepend-transform": "0.0.1015",
     "react": "^16.3.2",
     "react-test-renderer": "^16.3.2",
