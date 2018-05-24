@@ -28,10 +28,6 @@ const getEnvironmentPath = (versions: IVersions) => {
   ].join('-'));
 }
 
-const withNodeVersion = (version: string, cmd: string) => {
-  return `source ${NVM_PATH} && nvm exec ${version} ${cmd}`;
-};
-
 const ensureLinkIntoEnvironment = (
   environmentPath: string,
   p: string,
@@ -47,6 +43,24 @@ export const environment = (versions: IVersions) => {
 
   const installNodeVersion = (version: string) => {
     exec(`source ${NVM_PATH} && (nvm use ${version} || nvm install ${version})`);
+  };
+
+  const exec = (command: string, options?: cp.ExecOptions) => {
+    cp.execSync(
+      command,
+      {
+        ...options,
+        encoding: 'buffer',
+        cwd: environmentPath,
+        shell: 'bash',
+        stdio: ['ignore', 'ignore', 'inherit']
+      }
+    );
+  };
+
+  const execWithNodeVersion = (version: string, cmd: string, options?: cp.ExecOptions) => {
+    const prependedCmd = `source ${NVM_PATH} && nvm exec ${version} ${cmd}`;
+    exec(prependedCmd, options);
   };
 
   const remove = () => {
@@ -77,25 +91,11 @@ export const environment = (versions: IVersions) => {
 
     if (!fs.existsSync(path.resolve(environmentPath, 'node_modules'))) {
       // Install the specific versions of Realm and React
-      exec(
-        withNodeVersion(
-          versions.node,
-          `npm install realm@${versions.realm} react@${versions.react}`,
-        )
+      execWithNodeVersion(
+        versions.node,
+        `npm install realm@${versions.realm} react@${versions.react}`,
       );
     }
-  };
-
-  const exec = (command: string, options?: cp.ExecOptions) => {
-    cp.execSync(
-      command,
-      {
-        ...options,
-        encoding: 'buffer',
-        cwd: environmentPath,
-        stdio: ['ignore', 'ignore', 'inherit']
-      }
-    );
   };
 
   return { ensure, remove, exec };
