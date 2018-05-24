@@ -2,6 +2,9 @@
 
 @Library('realm-ci') _
 
+// Running in a bash shell with --login
+def run = { cmd -> sh "bash -l -c \"$cmd\"" }
+
 node('docker') {
   stage('Checkout') {
     checkout scm
@@ -10,15 +13,15 @@ node('docker') {
   stage('Install, build and package') {
     image = buildDockerEnv("ci/react-realm-context:building")
     image.inside("-e HOME=${env.WORKSPACE} -v /etc/passwd:/etc/passwd:ro") {
-      sh 'npm install'
-      sh 'npm run build'
-      sh 'npm pack'
+      run 'npm install'
+      run 'npm run build'
+      run 'npm pack'
     }
   }
 
   stage('Test') {
     image.inside("-e HOME=${env.WORKSPACE} -v /etc/passwd:/etc/passwd:ro") {
-      sh 'npm run test:ci'
+      run 'npm run test:ci'
     }
   }
 }
