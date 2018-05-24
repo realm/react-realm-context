@@ -15,6 +15,7 @@
     "email": "help@realm.io",
     "url": "https://realm.io"
   },
+  "repository": "https://github.com/realm/react-realm-context",
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/fs-extra": "^5.0.2",
