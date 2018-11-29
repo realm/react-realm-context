@@ -20,7 +20,6 @@ import * as assert from 'assert';
 import * as React from 'react';
 import * as renderer from 'react-test-renderer';
 import * as Realm from 'realm';
-import * as util from 'util';
 
 import { createRealmContext, RealmProvider as DefaultRealmProvider } from '.';
 
@@ -35,17 +34,21 @@ describe('realm-realm-context', () => {
       // Create a context
       const result = createRealmContext();
       // Assert something about it
-      assert.equal(Object.keys(result).length, 4);
+      assert.equal(Object.keys(result).length, 6);
       const {
         RealmProvider,
         RealmConsumer,
         RealmInitializer,
         RealmQuery,
+        RealmConnection,
+        withRealm,
       } = result;
       assert(RealmProvider);
       assert(RealmConsumer);
       assert(RealmInitializer);
       assert(RealmQuery);
+      assert(RealmConnection);
+      assert(withRealm);
     });
 
     it('calls any function passed as the children prop', () => {

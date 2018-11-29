@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import * as React from 'react';
-import * as Realm from 'realm';
 
 import { IRealmContext } from '.';
 
@@ -39,8 +38,7 @@ export const generateRealmConsumer = (
     }
 
     private renderContext = (value: IRealmContext) => {
-      const { realm } = value;
-      // Calling the function passed as children with the derived context
+      // Calling the function passed as children with the context
       return this.props.children(value);
     };
   }

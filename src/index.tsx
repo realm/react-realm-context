@@ -21,6 +21,7 @@ import * as Realm from 'realm';
 
 export type RealmRenderer = (context: IRealmContext) => React.ReactNode;
 
+import { generateRealmConnection } from './RealmConnection';
 import { generateRealmConsumer, IRealmConsumerProps } from './RealmConsumer';
 import {
   generateRealmInitializer,
@@ -28,6 +29,7 @@ import {
 } from './RealmInitializer';
 import { generateRealmProvider, IRealmProviderProps } from './RealmProvider';
 import { generateRealmQuery, IRealmQueryProps, Sorting } from './RealmQuery';
+import { generateWithRealm } from './withRealm';
 
 export {
   IRealmConsumerProps,
@@ -46,11 +48,15 @@ const createRealmContext = () => {
   const Consumer = generateRealmConsumer(context.Consumer);
   const Query = generateRealmQuery(Consumer);
   const Initializer = generateRealmInitializer(Consumer);
+  const Connection = generateRealmConnection(Consumer);
+  const withRealmHOC = generateWithRealm(Consumer);
   return {
     RealmProvider: Provider,
     RealmConsumer: Consumer,
     RealmQuery: Query,
     RealmInitializer: Initializer,
+    RealmConnection: Connection,
+    withRealm: withRealmHOC,
   };
 };
 
@@ -63,6 +69,15 @@ const {
   RealmConsumer,
   RealmQuery,
   RealmInitializer,
+  RealmConnection,
+  withRealm,
 } = createRealmContext();
 
-export { RealmProvider, RealmConsumer, RealmQuery, RealmInitializer };
+export {
+  RealmProvider,
+  RealmConsumer,
+  RealmQuery,
+  RealmInitializer,
+  RealmConnection,
+  withRealm,
+};

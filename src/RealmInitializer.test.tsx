@@ -39,13 +39,13 @@ describe('RealmInitializer', () => {
       <RealmProvider schema={schema}>
         <RealmInitializer>
           {({ realm }) => {
+            // Hang onto the realm for the test
+            realmReference = realm;
             realm.create('Person', { name: 'Bobby Boy' });
           }}
         </RealmInitializer>
         <RealmConsumer>
           {({ realm }) => {
-            // Hang onto the realm for the test
-            realmReference = realm;
             return realm
               .objects<IPerson>('Person')
               .map(person => person.name)

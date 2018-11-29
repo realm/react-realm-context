@@ -1,0 +1,64 @@
+////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2018 Realm Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
+
+import * as React from 'react';
+import * as Realm from 'realm';
+
+import { IRealmConsumerProps } from '.';
+
+type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
+
+// Props extends { [Property in TKey]: Realm}, TKey extends keyof Props
+
+export function generateWithRealm(
+  Consumer: React.ComponentType<IRealmConsumerProps>,
+) {
+  // Default key is "realm"
+  function withRealm<Props extends { realm: Realm }>(
+    Component: React.ComponentType<Props>,
+  ): React.ComponentType<Omit<Props, 'realm'>>;
+  // Alternatively a key is passed as a second argument
+  function withRealm<
+    Props extends { [P in TKey]: Realm },
+    TKey extends keyof Props
+  >(
+    Component: React.ComponentType<Props>,
+    key: TKey,
+  ): React.ComponentType<Omit<Props, TKey>>;
+  // Implementation doesn't care about the key
+  function withRealm<Props extends object>(
+    Component: React.ComponentType<Props>,
+    key: string = 'realm',
+  ) {
+    return class WithRealm extends React.Component<Props> {
+      public render() {
+        return (
+          <Consumer>
+            {context => {
+              // Inject a prop using the key supplied by the caller
+              const injectedProps = { [key]: context.realm };
+              return <Component {...injectedProps} {...this.props} />;
+            }}
+          </Consumer>
+        );
+      }
+    };
+  }
+  // Return the enhancing HOC
+  return withRealm;
+}
