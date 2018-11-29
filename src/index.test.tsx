@@ -52,7 +52,7 @@ describe('realm-realm-context', () => {
     });
 
     it('calls any function passed as the children prop', () => {
-      const { RealmProvider, RealmConsumer } = createRealmContext();
+      const { RealmProvider } = createRealmContext();
       const tree = renderer.create(
         <RealmProvider>
           {props => {
@@ -100,11 +100,9 @@ describe('realm-realm-context', () => {
     });
 
     it('calls any function passed as the children prop', () => {
-      let called = false;
       const tree = renderer.create(
         <DefaultRealmProvider>
           {() => {
-            called = true;
             return 'hi from render prop!';
           }}
         </DefaultRealmProvider>,

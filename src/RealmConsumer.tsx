@@ -20,7 +20,7 @@ import * as React from 'react';
 
 import { IRealmContext } from '.';
 
-export type ConsumerChild = (context: IRealmContext) => React.ReactChild;
+export type ConsumerChild = (context: IRealmContext) => React.ReactNode;
 
 export interface IRealmConsumerProps {
   children: ConsumerChild;
