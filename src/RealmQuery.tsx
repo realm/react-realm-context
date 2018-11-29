@@ -19,7 +19,7 @@
 import * as React from 'react';
 import * as Realm from 'realm';
 
-import { IRealmContext, RealmConsumer } from '.';
+import { IRealmContext } from '.';
 
 export interface IValue<T> {
   results: Realm.Results<T>;
@@ -32,14 +32,14 @@ export type Sorting = string | Realm.SortDescriptor | Realm.SortDescriptor[];
 
 export interface IRealmQueryProps<T> {
   children: QueryChild<T>;
-  type: string | Realm.ObjectSchema;
+  type: string;
   filter?: Filtering;
   sort?: Sorting;
 }
 
 export const generateRealmQuery = (
   WrappedConsumer: React.Consumer<IRealmContext>,
-): React.ComponentClass<IRealmQueryProps<any>> => {
+): React.ComponentType<IRealmQueryProps<any>> => {
   class RealmQuery<T> extends React.Component<IRealmQueryProps<T>> {
     private realm?: Realm;
     private results?: Realm.Results<T>;
@@ -55,7 +55,7 @@ export const generateRealmQuery = (
     }
 
     public render() {
-      return <RealmConsumer>{this.renderContext}</RealmConsumer>;
+      return <WrappedConsumer>{this.renderContext}</WrappedConsumer>;
     }
 
     private renderContext = (value: IRealmContext) => {

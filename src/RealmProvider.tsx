@@ -29,7 +29,7 @@ export interface IRealmProviderProps extends Realm.Configuration {
 
 export const generateRealmProvider = (
   WrappedProvider: React.Provider<IRealmContext>,
-): React.ComponentClass<IRealmProviderProps> => {
+): React.ComponentType<IRealmProviderProps> => {
   class RealmProvider extends React.Component<IRealmProviderProps> {
     private realm: Realm;
 
@@ -41,8 +41,6 @@ export const generateRealmProvider = (
       const { children, ...config } = this.props;
       this.realm = new Realm(config);
     }
-
-    // TODO: Remember propTypes
 
     public componentWillUnmount() {
       if (this.realm) {
@@ -56,7 +54,9 @@ export const generateRealmProvider = (
       const context = this.getContext();
       return (
         <WrappedProvider value={context}>
-          {typeof children === 'function' ? children(context) : children}
+          {typeof children === 'function'
+            ? (children as RealmRenderer)(context) /* Assume a RealmRenderer */
+            : children}
         </WrappedProvider>
       );
     }

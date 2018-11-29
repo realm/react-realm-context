@@ -20,7 +20,6 @@ import * as assert from 'assert';
 import * as React from 'react';
 import * as renderer from 'react-test-renderer';
 import * as Realm from 'realm';
-import * as util from 'util';
 
 import { createRealmContext, RealmProvider as DefaultRealmProvider } from '.';
 
