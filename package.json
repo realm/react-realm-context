@@ -6,6 +6,7 @@
     "build": "tsc -p config/tsconfig.build.json",
     "fix-headers": "node ./scripts/fix-headers.js",
     "lint:ts": "tslint --project tsconfig.json",
+    "prepack": "npm run build",
     "test": "mocha --opts config/mocha.opts",
     "test:ci": "mocha --opts config/mocha.ci.opts",
     "test:integration": "mocha --opts config/mocha.integration.opts",
@@ -35,17 +36,17 @@
     "prettier": "^1.12.1",
     "react": "^16.3.2",
     "react-test-renderer": "^16.3.2",
-    "realm": "^2.1.0",
-    "ts-node": "^6.0.3",
-    "tslint": "^5.10.0",
-    "tslint-config-prettier": "^1.13.0",
-    "tslint-eslint-rules": "^5.3.1",
-    "tslint-plugin-prettier": "^1.3.0",
+    "realm": "^2.20.0",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-plugin-prettier": "^2.0.1",
     "tslint-react": "^3.6.0",
-    "typescript": "^2.8.3"
+    "typescript": "^3.1.6"
   },
   "peerDependencies": {
     "react": ">=16.3",
-    "realm": ">=2.1"
+    "realm": ">=2.16"
   }
 }
