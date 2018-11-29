@@ -41,11 +41,13 @@ describe('realm-realm-context', () => {
         RealmConsumer,
         RealmInitializer,
         RealmQuery,
+        withRealm,
       } = result;
       assert(RealmProvider);
       assert(RealmConsumer);
       assert(RealmInitializer);
       assert(RealmQuery);
+      assert(withRealm);
     });
 
     it('calls any function passed as the children prop', () => {
