@@ -50,11 +50,11 @@ export const generateRealmConnection = (
       this.forgetSyncSession();
     }
 
-    private renderContext = ({ realm }: { realm: Realm }) => {
-      if (this.syncSession !== realm.syncSession) {
+    private renderContext = (context: IRealmContext) => {
+      if (context && this.syncSession !== context.realm.syncSession) {
         this.forgetSyncSession();
         // Remember this Realm to avoid adding the notification more than once
-        this.syncSession = realm.syncSession;
+        this.syncSession = context.realm.syncSession;
         // Add a connection notification listener
         if (this.syncSession) {
           this.syncSession.addConnectionNotification(
