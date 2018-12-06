@@ -70,6 +70,86 @@ describe('realm-realm-context', () => {
       tree.unmount();
     });
 
+    it('does not re-render RealmProvider when Realm changes', async () => {
+      // Create a context
+      const { RealmProvider } = createRealmContext();
+      let realm: Realm;
+      let updatingRenderCount = 0;
+      // Render it ..
+      const tree = renderer.create(
+        <RealmProvider
+          schema={[{ name: 'Person', properties: { name: 'string' } }]}
+        >
+          {context => {
+            realm = context.realm;
+            updatingRenderCount++;
+            return realm.objects('Person').length;
+          }}
+        </RealmProvider>,
+      );
+
+      process.nextTick(() => {
+        realm.write(() => {
+          realm.create('Person', { name: 'Alice' });
+        });
+        // Update it again ...
+        process.nextTick(() => {
+          realm.write(() => {
+            realm.create('Person', { name: 'Bob' });
+          });
+        });
+      });
+
+      // Wait for component to re-render
+      await new Promise(resolve => process.nextTick(resolve));
+      assert.equal(tree.toJSON(), '0');
+      tree.unmount();
+      // Just once
+      assert.equal(updatingRenderCount, 1);
+    });
+
+    it('re-renders RealmProvider when Realm changes when asked to', async () => {
+      // Create a context
+      const { RealmProvider } = createRealmContext();
+      let realm: Realm;
+      let updatingRenderCount = 0;
+      // Render it ..
+      const tree = renderer.create(
+        <RealmProvider
+          schema={[{ name: 'Person', properties: { name: 'string' } }]}
+          updateOnChange={true}
+        >
+          {context => {
+            realm = context.realm;
+            updatingRenderCount++;
+            return realm
+              .objects<{ name: string }>('Person')
+              .map(p => p.name)
+              .join(' & ');
+          }}
+        </RealmProvider>,
+      );
+
+      process.nextTick(() => {
+        realm.write(() => {
+          realm.create('Person', { name: 'Alice' });
+        });
+        // Update it again ...
+        process.nextTick(() => {
+          realm.write(() => {
+            realm.create('Person', { name: 'Bob' });
+          });
+        });
+      });
+
+      // Wait for component to re-render
+      await new Promise(resolve => process.nextTick(resolve));
+      assert.equal(tree.toJSON(), 'Alice & Bob');
+      tree.unmount();
+      // Initially, creating Alice and creating Bob
+      assert.equal(updatingRenderCount, 3);
+    });
+
     it('renders the RealmConsumer when wrapped in RealmProvider', () => {
       // Create a context
       const { RealmProvider, RealmConsumer } = createRealmContext();
@@ -90,6 +170,55 @@ describe('realm-realm-context', () => {
       );
       assert.equal(tree.toJSON(), 'hi from context consumer!');
       tree.unmount();
+    });
+
+    it('re-renders RealmConsumer when Realm changes only when asked to', async () => {
+      // Create a context
+      const { RealmProvider, RealmConsumer } = createRealmContext();
+      let defaultRenderCount = 0;
+      let updatingRenderCount = 0;
+      // Render it ..
+      const tree = renderer.create(
+        <RealmProvider
+          schema={[{ name: 'Person', properties: { name: 'string' } }]}
+        >
+          <RealmConsumer>
+            {({ realm }) => {
+              process.nextTick(() => {
+                realm.write(() => {
+                  realm.create('Person', { name: 'Alice' });
+                });
+                // Update it again ...
+                process.nextTick(() => {
+                  realm.write(() => {
+                    realm.create('Person', { name: 'Bob' });
+                  });
+                });
+              });
+              defaultRenderCount++;
+              return null;
+            }}
+          </RealmConsumer>
+          <RealmConsumer updateOnChange={true}>
+            {({ realm }) => {
+              updatingRenderCount++;
+              return realm
+                .objects<{ name: string }>('Person')
+                .map(p => p.name)
+                .join(' & ');
+            }}
+          </RealmConsumer>
+        </RealmProvider>,
+      );
+
+      // Wait for component to re-render
+      await new Promise(resolve => process.nextTick(resolve));
+      assert.equal(tree.toJSON(), 'Alice & Bob');
+      tree.unmount();
+
+      assert.equal(defaultRenderCount, 1);
+      // Initially, creating Alice and creating Bob
+      assert.equal(updatingRenderCount, 3);
     });
   });
 

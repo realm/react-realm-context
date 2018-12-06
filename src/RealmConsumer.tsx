@@ -24,6 +24,7 @@ export type ConsumerChild = (context: IRealmContext) => React.ReactNode;
 
 export interface IRealmConsumerProps {
   children: ConsumerChild;
+  updateOnChange?: boolean;
 }
 
 export const generateRealmConsumer = (
@@ -31,15 +32,41 @@ export const generateRealmConsumer = (
 ): React.ComponentType<IRealmConsumerProps> => {
   class RealmConsumer extends React.Component<IRealmConsumerProps> {
     // TODO: Add propTypes for non-TypeScript users
-    // TODO: Complain if used without a Realm Provider
+
+    private realm: Realm;
+
+    public componentWillUnmount() {
+      this.forgetRealm();
+    }
 
     public render() {
       return <WrappedConsumer>{this.renderContext}</WrappedConsumer>;
     }
 
-    private renderContext = (value: IRealmContext) => {
+    private renderContext = (context: IRealmContext | null) => {
+      const { updateOnChange } = this.props;
+      // Register a listener when the Realm passed throught the context changes
+      if (context !== null && this.realm !== context.realm && updateOnChange) {
+        // Remove the listener from any Realm to which it was already added
+        this.forgetRealm();
+        this.realm = context.realm;
+        this.realm.addListener('change', this.onRealmChange);
+        this.realm.addListener('schema', this.onRealmChange);
+      }
       // Calling the function passed as children with the context
-      return this.props.children(value);
+      return this.props.children(context);
+    };
+
+    private forgetRealm() {
+      if (this.realm && !this.realm.isClosed) {
+        this.realm.removeListener('change', this.onRealmChange);
+        this.realm.removeListener('schema', this.onRealmChange);
+      }
+      delete this.realm;
+    }
+
+    private onRealmChange = () => {
+      this.forceUpdate();
     };
   }
 

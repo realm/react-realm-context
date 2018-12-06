@@ -39,20 +39,22 @@ export function generateWithRealm(
   >(
     Component: React.ComponentType<Props>,
     key: TKey,
+    consumerProps?: Partial<IRealmConsumerProps>,
   ): React.ComponentType<Omit<Props, TKey>>;
   // Implementation doesn't care about the key
   function withRealm<Props extends object>(
     Component: React.ComponentType<Props>,
     key: string = 'realm',
+    consumerProps: Partial<IRealmConsumerProps> = {},
   ) {
     return class WithRealm extends React.Component<Props> {
       public render() {
         return (
-          <Consumer>
+          <Consumer {...consumerProps}>
             {context => {
               // Inject a prop using the key supplied by the caller
               const injectedProps = { [key]: context.realm };
-              return <Component {...injectedProps} {...this.props} />;
+              return <Component {...this.props} {...injectedProps} />;
             }}
           </Consumer>
         );

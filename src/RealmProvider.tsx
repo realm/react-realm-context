@@ -25,6 +25,7 @@ export type RealmRenderer = (context: IRealmContext) => React.ReactChild;
 
 export interface IRealmProviderProps extends Realm.Configuration {
   children: React.ReactNode | RealmRenderer;
+  updateOnChange?: boolean;
 }
 
 export const generateRealmProvider = (
@@ -40,10 +41,18 @@ export const generateRealmProvider = (
       // Open the Realm
       const { children, ...config } = this.props;
       this.realm = new Realm(config);
+      if (props.updateOnChange) {
+        this.realm.addListener('change', this.onRealmChange);
+        this.realm.addListener('schema', this.onRealmChange);
+      }
     }
 
     public componentWillUnmount() {
       if (this.realm) {
+        if (!this.realm.isClosed) {
+          this.realm.removeListener('change', this.onRealmChange);
+          this.realm.removeListener('schema', this.onRealmChange);
+        }
         this.realm.close();
         delete this.realm;
       }
@@ -62,10 +71,12 @@ export const generateRealmProvider = (
     }
 
     private getContext(): IRealmContext {
-      return {
-        realm: this.realm,
-      };
+      return { realm: this.realm };
     }
+
+    private onRealmChange = () => {
+      this.forceUpdate();
+    };
   }
 
   return RealmProvider;

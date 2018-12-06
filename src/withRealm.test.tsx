@@ -116,4 +116,68 @@ describe('withRealm injector', () => {
     // Check that unmounting did indeed close the Realm
     assert.equal(realmReference.isClosed, true, 'the Realm was not closed');
   });
+
+  it('will pass on props given when calling withRealm', async () => {
+    let realmReference: Realm;
+
+    let defaultRenderCount = 0;
+    let updatingRenderCount = 0;
+
+    class SomeComponent extends React.Component<{
+      children?: React.ReactNode;
+      realm: Realm;
+    }> {
+      public render() {
+        const { realm } = this.props;
+        realmReference = realm;
+        updatingRenderCount++;
+        return realm
+          .objects<{ name: string }>('Person')
+          .map(p => p.name)
+          .join(' & ');
+      }
+    }
+
+    const SomeEnhancedComponent = withRealm(SomeComponent, 'realm', {
+      updateOnChange: true,
+    });
+
+    tree = renderer.create(
+      <RealmProvider
+        schema={[{ name: 'Person', properties: { name: 'string' } }]}
+      >
+        <RealmConsumer>
+          {({ realm }) => {
+            process.nextTick(() => {
+              realm.write(() => {
+                realm.create('Person', { name: 'Alice' });
+              });
+              // Update it again ...
+              process.nextTick(() => {
+                realm.write(() => {
+                  realm.create('Person', { name: 'Bob' });
+                });
+              });
+            });
+            defaultRenderCount++;
+            return null;
+          }}
+        </RealmConsumer>
+        <SomeEnhancedComponent />
+      </RealmProvider>,
+    );
+
+    // Wait for component to re-render
+    await new Promise(resolve => process.nextTick(resolve));
+
+    assert.equal(tree.toJSON(), 'Alice & Bob');
+    tree.unmount();
+    tree = null;
+
+    assert.equal(defaultRenderCount, 1);
+    // Initially, creating Alice and creating Bob
+    assert.equal(updatingRenderCount, 3);
+    // Check that unmounting did indeed close the Realm
+    assert.equal(realmReference.isClosed, true, 'the Realm was not closed');
+  });
 });
