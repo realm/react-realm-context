@@ -55,6 +55,8 @@ pipeline {
             keepLongStdio: true,
             testResults: '*-test-results.xml'
           )
+          // Remove any archives produced by the tests
+          sh 'rm react-realm-context-*.tgz'
         }
       }
     }
