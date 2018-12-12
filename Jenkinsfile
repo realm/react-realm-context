@@ -31,7 +31,7 @@ pipeline {
     }
 
     stage('Test') {
-      stages {
+      parallel {
         stage('Unit tests') {
           steps {
             sh 'npm run test:ci -- src/**/*.test.tsx'
