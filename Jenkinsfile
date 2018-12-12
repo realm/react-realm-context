@@ -65,10 +65,6 @@ pipeline {
         branch 'master'
       }
       */
-      input {
-        message "Change version, package and publish?"
-        id "package"
-      }
       stages {
         stage('Change version') {
           steps {
@@ -118,8 +114,9 @@ pipeline {
         }
         stage('Publish') {
           input {
-            message "Publish?"
+            message "Do you want to publish this to GitHub and NPM?"
             id "publish"
+            ok: "Publish!"
           }
           steps {
             // TODO: Push archive to NPM
