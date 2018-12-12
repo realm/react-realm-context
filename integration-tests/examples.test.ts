@@ -5,7 +5,8 @@ import * as path from 'path';
 const EXAMPLES_PATH = path.resolve(__dirname, '../examples');
 
 describe('Examples', () => {
-  before(() => {
+  before(function() {
+    this.timeout(10000);
     // Build the package
     cp.execSync('npm pack ..', {
       cwd: EXAMPLES_PATH,
