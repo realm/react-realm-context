@@ -59,25 +59,29 @@ pipeline {
       }
     }
 
-    stage('Prepare, package & publish') {
+    stage('Package') {
       when {
-        beforeInput true
-        branch 'master'
         not {
-          // Don't trigger this from:
-          // 1. the commit restoring the release notes nor
-          // 2. the commit tagged with the version
-          anyOf {
-            changelog 'Restoring RELEASENOTES'
+          allOf {
+            branch 'master'
             tag "v*"
           }
         }
       }
+      steps {
+        // Remove any archives produced by the tests
+        sh 'rm -f react-realm-context-*.tgz'
+        // Ignore the prepack running "build" again
+        sh 'npm pack --ignore-scripts'
+        // Archive the archive
+        archiveArtifacts 'react-realm-context-*.tgz'
+      }
+    }
 
-      input {
-        message "Prepare this for publishing?"
-        id "prepare"
-        ok "Prepare!"
+    stage('Prepare, package & publish') {
+      when {
+        branch 'master'
+        tag "v*"
       }
 
       stages {
@@ -173,6 +177,7 @@ pipeline {
             sh 'rm -f react-realm-context-*.tgz'
             // Ignore the prepack running "build" again
             sh 'npm pack --ignore-scripts'
+            // Archive the archive
             archiveArtifacts 'react-realm-context-*.tgz'
             // TODO: Upload the archive to NPM
           }
