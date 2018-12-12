@@ -42,15 +42,12 @@ describe('Environments', () => {
           this.timeout(20000);
           // Run the tests with the appropreate arguments
           const args = [
-            '--opts config/mocha.opts',
             // We need to tell node (via mocha) to preserve the symlinks when requiring modules,
             // otherwise we'll be requiring modules relative to the original src folder
             '--preserve-symlinks',
-            process.env.CI
-              ? '--reporter mocha-junit-reporter'
-              : '--reporter dot',
+            '--reporter dot',
           ];
-          return env.exec(`npx mocha ${args.join(' ')}`);
+          return env.exec(`npm test -- ${args.join(' ')}`);
         });
       },
     );
