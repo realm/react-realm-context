@@ -104,6 +104,22 @@ pipeline {
               changeLog = "# Release ${nextVersion.substring(1)} (${today})\n\n${releaseNotes}\n\n${changeLog}"
               writeFile file: 'CHANGELOG.md', text: changeLog
             }
+          }
+        }
+        stage('Package') {
+          steps {
+            // Ignore the prepack running "build" again
+            sh 'npm pack --ignore-scripts'
+            archiveArtifacts 'react-realm-context-*.tgz'
+          }
+        }
+        stage('Publish') {
+          input {
+            message "Publish?"
+            id "publish"
+          }
+          steps {
+            // TODO: Push archive to NPM
             // Create a draft release on GitHub
             script {
               withCredentials([
@@ -147,23 +163,6 @@ pipeline {
                 sh "git push --tags origin HEAD"
               }
             }
-          }
-        }
-        stage('Package') {
-          steps {
-            // Ignore the prepack running "build" again
-            sh 'npm pack --ignore-scripts'
-            archiveArtifacts 'react-realm-context-*.tgz'
-          }
-        }
-        stage('Publish') {
-          input {
-            message "Publish?"
-            id "publish"
-          }
-          steps {
-            // Ignore the prepack running "build" again
-            sh 'npm pack --ignore-scripts'
           }
         }
       }
