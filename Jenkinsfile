@@ -59,12 +59,29 @@ pipeline {
       }
     }
 
-    stage('Change version, package and publish') {
+    stage('Prepare, package & publish') {
       when {
+        beforeInput true
         branch 'master'
+        not {
+          // Don't trigger this from:
+          // 1. the commit restoring the release notes nor
+          // 2. the commit tagged with the version
+          anyOf {
+            changelog 'Restoring RELEASENOTES'
+            tag "v*"
+          }
+        }
       }
+
+      input {
+        message "Prepare this for publishing?"
+        id "prepare"
+        ok "Prepare!"
+      }
+
       stages {
-        stage('Change version') {
+        stage('Prepare') {
           steps {
             // Change the version in the package.json and package-lock.json
             script {
@@ -96,33 +113,16 @@ pipeline {
               today = new Date().format('yyyy-MM-dd')
               // Append the release notes to the change log
               changeLog = readFile 'CHANGELOG.md'
-              changeLog = "# Release ${nextVersion.substring(1)} (${today})\n\n${releaseNotes}\n\n${changeLog}"
-              writeFile file: 'CHANGELOG.md', text: changeLog
+              writeFile(
+                file: 'CHANGELOG.md',
+                text: "# Release ${nextVersion.substring(1)} (${today})\n\n${releaseNotes}\n\n${changeLog}",
+              )
             }
-          }
-        }
-        stage('Package') {
-          steps {
-            // Remove any archives produced by the tests
-            sh 'rm -f react-realm-context-*.tgz'
-            // Ignore the prepack running "build" again
-            sh 'npm pack --ignore-scripts'
-            archiveArtifacts 'react-realm-context-*.tgz'
-          }
-        }
-        stage('Publish') {
-          input {
-            message "Do you want to publish this to GitHub and NPM?"
-            id "publish"
-            ok "Publish!"
-          }
-          steps {
-            // TODO: Push archive to NPM
             // Create a draft release on GitHub
-            script {
-              withCredentials([
-                string(credentialsId: 'github-release-token', variable: 'GITHUB_TOKEN')
-              ]) {
+            withCredentials([
+              string(credentialsId: 'github-release-token', variable: 'GITHUB_TOKEN')
+            ]) {
+              script {
                 requestBody = JsonOutput.toJson([
                   tag_name: nextVersion,
                   name: "${nextVersion.substring(1)}: ...",
@@ -140,27 +140,52 @@ pipeline {
                 """
               }
             }
+
             // Commit to git and push to GitHub
+
+            // Set the email and name used when committing
+            sh 'git config --global user.email "ci@realm.io"'
+            sh 'git config --global user.name "Jenkins CI"'
+
+            // Stage the updates to the files, commit and tag the commit
+            sh 'git add package.json package-lock.json CHANGELOG.md'
+            sh "git commit -m 'Prepare version ${nextVersion}'"
+            sh "git tag ${nextVersion}"
+
+            // Restore the release notes from the template
+            sh 'cp docs/RELEASENOTES.template.md RELEASENOTES.md'
+            sh 'git add RELEASENOTES.md'
+            sh "git commit -m 'Restoring RELEASENOTES.md'"
+
+            // Push
             script {
-              // Set the email and name used when committing
-              sh 'git config --global user.email "ci@realm.io"'
-              sh 'git config --global user.name "Jenkins CI"'
-
-              // Stage the updates to the files, commit and tag the commit
-              sh 'git add package.json package-lock.json CHANGELOG.md'
-              sh "git commit -m 'Prepare version ${nextVersion}'"
-              sh "git tag ${nextVersion}"
-
-              // Restore the release notes from the template
-              sh 'cp docs/RELEASENOTES.template.md RELEASENOTES.md'
-              sh 'git add RELEASENOTES.md'
-              sh "git commit -m 'Restoring RELEASENOTES.md'"
-
               sshagent(['realm-ci-ssh']) {
                 // Push with tags
                 sh "git push --tags origin HEAD"
               }
             }
+          }
+        }
+
+        stage('Package') {
+          steps {
+            // Remove any archives produced by the tests
+            sh 'rm -f react-realm-context-*.tgz'
+            // Ignore the prepack running "build" again
+            sh 'npm pack --ignore-scripts'
+            archiveArtifacts 'react-realm-context-*.tgz'
+            // TODO: Upload the archive to NPM
+          }
+        }
+
+        stage('Publish') {
+          input {
+            message "Do you want to publish this to GitHub and NPM?"
+            id "publish"
+            ok "Publish!"
+          }
+          steps {
+            // TODO: Push archive to NPM
           }
         }
       }
