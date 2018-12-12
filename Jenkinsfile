@@ -31,8 +31,22 @@ pipeline {
     }
 
     stage('Test') {
-      steps {
-        sh 'npm run test:ci'
+      stages {
+        stage('Unit tests') {
+          steps {
+            sh 'npm run test:ci -- src/**/*.test.tsx'
+          }
+        }
+        stage('Environment integration tests') {
+          steps {
+            sh 'npm run test:ci -- integration-tests/environments.test.ts'
+          }
+        }
+        stage('Example apps') {
+          steps {
+            sh 'npm run test:ci -- integration-tests/examples.test.ts'
+          }
+        }
       }
       post {
         always {
@@ -66,11 +80,10 @@ pipeline {
         stage('Change version') {
           steps {
             script {
-              nextVersion = sh(
+              currentBuild.displayName = sh(
                 script: "npm version --no-git-tag-version ${NEXT_VERSION}",
                 returnStdout: true,
               ).trim()
-              setBuildName(nextVersion);
             }
           }
         }
