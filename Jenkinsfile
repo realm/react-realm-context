@@ -71,6 +71,8 @@ pipeline {
       steps {
         // Remove any archives produced by the tests
         sh 'rm -f react-realm-context-*.tgz'
+        // Update the version of the package
+        sh "npm version prerelease --preid=${BUILD_TAG}"
         // Ignore the prepack running "build" again
         sh 'npm pack --ignore-scripts'
         // Archive the archive
