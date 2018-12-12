@@ -34,17 +34,17 @@ pipeline {
       parallel {
         stage('Unit tests') {
           steps {
-            sh 'npm run test:ci -- src/**/*.test.tsx'
+            sh 'npm run test:ci -- src/**/*.test.tsx --reporter-options mochaFile=unit-test-results.xml'
           }
         }
         stage('Environment integration tests') {
           steps {
-            sh 'npm run test:ci -- integration-tests/environments.test.ts'
+            sh 'npm run test:ci -- integration-tests/environments.test.ts --reporter-options mochaFile=environments-test-results.xml'
           }
         }
         stage('Example apps') {
           steps {
-            sh 'npm run test:ci -- integration-tests/examples.test.ts'
+            sh 'npm run test:ci -- integration-tests/examples.test.ts --reporter-options mochaFile=examples-test-results.xml'
           }
         }
       }
@@ -53,7 +53,7 @@ pipeline {
           junit(
             allowEmptyResults: true,
             keepLongStdio: true,
-            testResults: 'test-results.xml'
+            testResults: '*-test-results.xml'
           )
         }
       }
