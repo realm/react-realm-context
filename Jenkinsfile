@@ -1,71 +1,96 @@
 #!groovy
 
-@Library('realm-ci') _
-
-node('docker') {
+pipeline {
   agent {
     docker {
-      image buildDockerEnv("ci/react-realm-context:building")
+      image 'node:8'
+      label 'docker'
       args "-e HOME=${env.WORKSPACE} -v /etc/passwd:/etc/passwd:ro"
     }
   }
 
-  stage('Checkout') {
-    checkout scm
-  }
-
-  stage('Install, build and package') {
-    sh 'npm install'
-    try {
-      sh 'npm run lint:ts'
-    } catch (err) {
-      error "Linting failed"
-    }
-    sh 'npm run build'
-  }
-
-  stage('Test') {
-    try {
-      // Run the tests and report using the junit reporter
-      sh 'npm run test:ci'
-    } catch (err) {
-      error "Tests failed - see results on CI"
-    } finally {
-      junit(
-        allowEmptyResults: true,
-        keepLongStdio: true,
-        testResults: 'test-results.xml'
-      )
-    }
-  }
-
-  stage('Release: Change version, package & publish') {
-    when {
-      branch 'master'
-    }
-    input {
-      message "Change version, package and publish?"
-      id "release"
-      parameters {
-        choice(
-          name: 'NEXT_VERSION',
-          choices: ['major', 'minor', 'patch', 'premajor', 'preminor', 'prepatch', 'prerelease'],
-          description: 'What version should this release have?',
-        )
+  stages {
+    stage('Install, pre-check and build') {
+      stages {
+        stage('Install') {
+          steps {
+            sh 'npm install'
+          }
+        }
+        stage('Lint') {
+          steps {
+            sh 'npm run lint:ts'
+          }
+        }
+        stage('Build') {
+          steps {
+            sh 'npm run build'
+          }
+        }
       }
     }
-    steps {
-      stage('Change version') {
-        // Change the version
-        sh "npm version ${NEXT_VERSION}"
-        // TODO: Commit, tag and push to GitHub
+
+    stage('Test') {
+      steps {
+        sh 'npm run test:ci'
       }
-      stage('Package') {
-        sh 'npm pack'
-        archiveArtifacts 'react-realm-context-*.tgz'
+      post {
+        always {
+          junit(
+            allowEmptyResults: true,
+            keepLongStdio: true,
+            testResults: 'test-results.xml'
+          )
+        }
       }
-      stage('Publish') {
-        // TODO: Publish artifact to NPM
+    }
+
+    stage('Bump version, package and publish') {
+      /*
+      when {
+        branch 'master'
+      }
+      */
+      input {
+        message "Change version, package and publish?"
+        id "package"
+        parameters {
+          choice(
+            name: 'NEXT_VERSION',
+            choices: ['major', 'minor', 'patch', 'premajor', 'preminor', 'prepatch', 'prerelease'],
+            description: 'What version should this release have?',
+          )
+        }
+      }
+      stages {
+        stage('Change version') {
+          steps {
+            script {
+              nextVersion = sh(
+                script: "npm version --no-git-tag-version ${NEXT_VERSION}",
+                returnStdout: true,
+              ).trim()
+              setBuildName(nextVersion);
+            }
+          }
+        }
+        stage('Package') {
+          steps {
+            // Ignore the prepack running "build" again
+            sh 'npm pack --ignore-scripts'
+            archiveArtifacts 'react-realm-context-*.tgz'
+          }
+        }
+        stage('Publish') {
+          input {
+            message "Publish?"
+            id "publish"
+          }
+          steps {
+            // Ignore the prepack running "build" again
+            sh 'npm pack --ignore-scripts'
+          }
+        }
       }
     }
   }
