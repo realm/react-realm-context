@@ -114,7 +114,7 @@ pipeline {
           input {
             message "Do you want to publish this to GitHub and NPM?"
             id "publish"
-            ok: "Publish!"
+            ok "Publish!"
           }
           steps {
             // TODO: Push archive to NPM
