@@ -34,17 +34,17 @@ pipeline {
       parallel {
         stage('Unit tests') {
           steps {
-            sh 'npm run test:ci -- --reporter-options mochaFile=unit-test-results.xml src/**/*.test.tsx'
+            sh 'MOCHA_FILE=unit-test-results.xml npm run test:ci -- src/**/*.test.tsx'
           }
         }
-        stage('Environment integration tests') {
+        stage('Environment tests') {
           steps {
-            sh 'npm run test:ci -- --reporter-options mochaFile=environments-test-results.xml integration-tests/environments.test.ts'
+            sh 'MOCHA_FILE=environments-test-results.xml npm run test:ci -- integration-tests/environments.test.ts'
           }
         }
         stage('Example apps') {
           steps {
-            sh 'npm run test:ci -- --reporter-options mochaFile=examples-test-results.xml integration-tests/examples.test.ts'
+            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts'
           }
         }
       }
