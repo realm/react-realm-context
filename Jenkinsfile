@@ -71,6 +71,8 @@ pipeline {
       steps {
         // Remove any archives produced by the tests
         sh 'rm -f react-realm-context-*.tgz'
+        // Restore the package and package lock (might be modified by the tests)
+        sh 'git checkout package.json package-lock.json'
         // Update the version of the package
         sh "npm version prerelease --preid=${BUILD_TAG}"
         // Ignore the prepack running "build" again
