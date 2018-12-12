@@ -186,6 +186,7 @@ pipeline {
           }
           steps {
             // TODO: Push archive to NPM
+            sh 'echo "Publish!"'
           }
         }
       }
