@@ -55,8 +55,6 @@ pipeline {
             keepLongStdio: true,
             testResults: '*-test-results.xml'
           )
-          // Remove any archives produced by the tests
-          sh 'rm react-realm-context-*.tgz'
         }
       }
     }
@@ -108,6 +106,8 @@ pipeline {
         }
         stage('Package') {
           steps {
+            // Remove any archives produced by the tests
+            sh 'rm -f react-realm-context-*.tgz'
             // Ignore the prepack running "build" again
             sh 'npm pack --ignore-scripts'
             archiveArtifacts 'react-realm-context-*.tgz'
