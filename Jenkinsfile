@@ -59,12 +59,10 @@ pipeline {
       }
     }
 
-    stage('Bump version, package and publish') {
-      /*
+    stage('Change version, package and publish') {
       when {
         branch 'master'
       }
-      */
       stages {
         stage('Change version') {
           steps {
