@@ -74,6 +74,9 @@ pipeline {
           steps {
             // Change the version in the package.json and package-lock.json
             script {
+              // Read the current version of the package
+              packageJson = readJSON file: 'package.json'
+              versionBefore = "v${packageJson.version}"
               // Determine the upcoming release type
               nextVersionType = sh(
                 script: "node ./scripts/next-version.js",
@@ -92,7 +95,7 @@ pipeline {
               // Read the release notes and replace in any variables
               releaseNotes = readFile 'RELEASENOTES.md'
               releaseNotes = releaseNotes
-                .replaceAll("\\{PREVIOUS_VERSION\\}", "v${currentVersion}")
+                .replaceAll("\\{PREVIOUS_VERSION\\}", versionBefore)
                 .replaceAll("\\{CURRENT_VERSION\\}", nextVersion)
 
               // Get todays date
