@@ -1,4 +1,0 @@
--r ts-node/register
---reporter mocha-junit-reporter
---forbid-only
---exit

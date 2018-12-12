@@ -2,4 +2,3 @@
 --forbid-only
 --watch-extensions ts,tsx
 --exit
-src/**/*.test.tsx
