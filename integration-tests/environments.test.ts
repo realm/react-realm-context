@@ -1,7 +1,7 @@
 import { environment, IVersions } from './environment';
 
 const VERSIONS = {
-  realm: ['2.1.0', '2.6.0'],
+  realm: ['2.16.0', '2.21.0'],
   react: ['16.3.2'],
 };
 
@@ -40,7 +40,17 @@ describe('Environments', () => {
 
         it('creates an environment and passes the test', function() {
           this.timeout(20000);
-          return env.exec('npm run test:in-environment');
+          // Run the tests with the appropreate arguments
+          const args = [
+            '--opts config/mocha.opts',
+            // We need to tell node (via mocha) to preserve the symlinks when requiring modules,
+            // otherwise we'll be requiring modules relative to the original src folder
+            '--preserve-symlinks',
+            process.env.CI
+              ? '--reporter mocha-junit-reporter'
+              : '--reporter dot',
+          ];
+          return env.exec(`npx mocha ${args.join(' ')}`);
         });
       },
     );
