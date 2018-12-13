@@ -67,6 +67,10 @@ pipeline {
     }
   }
 
+  options {
+    skipDefaultCheckout()
+  }
+
   parameters {
     booleanParam(
       name: 'PREPARE',
@@ -81,6 +85,25 @@ pipeline {
   }
 
   stages {
+    stage('Checkout') {
+      steps {
+        checkout([
+          $class: 'GitSCM',
+          branches: scm.branches,
+          extensions: scm.extensions + [
+            [$class: 'WipeWorkspace'],
+            [$class: 'CleanCheckout'],
+            [$class: 'LocalBranch']
+          ],
+          userRemoteConfigs: [[
+            credentialsId: 'realm-ci-ssh',
+            name: 'origin',
+            url: 'git@github.com:realm/react-realm-context.git'
+          ]]
+        ])
+      }
+    }
+
     stage('Install') {
       steps {
         // Perform the install
@@ -199,11 +222,9 @@ pipeline {
         sh 'git add RELEASENOTES.md'
         sh "git commit -m 'Restoring RELEASENOTES.md'"
 
-        // Set the origin to ensure the push will happen via SSH
-        sh 'git remote set-url origin git@github.com:realm/react-realm-context.git'
         // Push to GitHub with tags
         sshagent(['realm-ci-ssh']) {
-          sh "git push --tags origin"
+          sh "git push --tags origin HEAD"
         }
       }
     }
