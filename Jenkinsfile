@@ -131,7 +131,7 @@ pipeline {
       }
     }
 
-    stage('Test') {
+    stage('Pre-package tests') {
       when {
         // Don't run tests when preparing as they'll run again for the tagged commit afterwards
         not { environment name: 'PREPARE', value: 'true' }
@@ -145,11 +145,6 @@ pipeline {
         stage('Environment tests') {
           steps {
             sh 'MOCHA_FILE=environments-test-results.xml npm run test:ci -- integration-tests/environments.test.ts'
-          }
-        }
-        stage('Example apps') {
-          steps {
-            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts'
           }
         }
       }
@@ -249,6 +244,29 @@ pipeline {
       }
     }
 
+    stage('Post-packaging tests') {
+      when {
+        // Don't run tests when preparing as they'll run again for the tagged commit afterwards
+        not { environment name: 'PREPARE', value: 'true' }
+      }
+      parallel {
+        stage('Example apps') {
+          steps {
+            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts'
+          }
+        }
+      }
+      post {
+        always {
+          junit(
+            allowEmptyResults: true,
+            keepLongStdio: true,
+            testResults: '*-test-results.xml'
+          )
+        }
+      }
+    }
+
     // More advanced packaging for commits tagged as versions
     stage('Publish') {
       when {
@@ -256,8 +274,9 @@ pipeline {
         tag 'v*'
       }
       steps {
-        // TODO: Push archive to NPM
         sh 'echo "Publish!"'
+        // TODO: Push archive to NPM
+        // TODO: Upload artifacts to GitHub and publish release
       }
     }
   }
