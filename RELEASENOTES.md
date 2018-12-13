@@ -9,3 +9,4 @@
 ## Internals
 - Running example app tests post-packaging with the actual archive.
 - Allowing unchanged release notes.
+- Parallel testing of specific example apps.

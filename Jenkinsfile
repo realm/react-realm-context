@@ -251,9 +251,24 @@ pipeline {
         not { environment name: 'PREPARE', value: 'true' }
       }
       parallel {
-        stage('Example apps') {
+        stage('Example #1') {
           steps {
-            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts'
+            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts --grep="initializer-and-query"'
+          }
+        }
+        stage('Example #2') {
+          steps {
+            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts --grep="multiple-realms"'
+          }
+        }
+        stage('Example #3') {
+          steps {
+            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts --grep="simple-context"'
+          }
+        }
+        stage('Example #4') {
+          steps {
+            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts --grep="simple-render-props"'
           }
         }
       }
