@@ -100,6 +100,7 @@ pipeline {
           userRemoteConfigs: [[
             credentialsId: 'realm-ci-ssh',
             name: 'origin',
+            refspec: '+refs/tags/*:refs/remotes/origin/tags/* +refs/heads/*:refs/remotes/origin/*',
             url: 'git@github.com:realm/react-realm-context.git'
           ]]
         ])
