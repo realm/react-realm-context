@@ -63,6 +63,19 @@ pipeline {
     }
   }
 
+  parameters {
+    booleanParam(
+      name: 'PREPARE',
+      defaultValue: false,
+      description: '''Prepare for publishing?
+        Changes version based on release notes,
+        copies release notes to changelog,
+        creates a draft GitHub release and
+        pushes a tagged commit to git.
+      ''',
+    )
+  }
+
   stages {
     stage('Install, pre-check and build') {
       stages {
@@ -85,6 +98,10 @@ pipeline {
     }
 
     stage('Test') {
+      when {
+        // Don't run tests when preparing as they'll run again for the tagged commit afterwards
+        not { environment name: 'PREPARE', value: 'true' }
+      }
       parallel {
         stage('Unit tests') {
           steps {
@@ -113,14 +130,78 @@ pipeline {
       }
     }
 
-    stage('Package') {
+    // Prepares for a release by
+    // 1. changing version,
+    // 2. copying release notes to the changelog,
+    // 3. creating a draft GitHub release and
+    // 4. pushing a tagged commit to git
+    stage('Prepare') {
       when {
-        not {
-          allOf {
-            branch 'master'
-            tag "v*"
+        environment name: 'PREPARE', value: 'true'
+      }
+      steps {
+        script {
+          // Read the current version of the package
+          packageJson = readJSON file: 'package.json'
+          versionBefore = "v${packageJson.version}"
+          // Change the version
+          nextVersion = changeVersion()
+        }
+        // Append the RELEASENOTES to the CHANGELOG
+        script {
+          releaseNotes = copyReleaseNotes(versionBefore, nextVersion)
+        }
+        // Create a draft release on GitHub
+        withCredentials([
+          string(credentialsId: 'github-release-token', variable: 'GITHUB_TOKEN')
+        ]) {
+          script {
+            requestBody = JsonOutput.toJson([
+              tag_name: nextVersion,
+              name: "${nextVersion.substring(1)}: ...",
+              body: releaseNotes,
+              draft: true,
+            ])
+            // Send a request to GitHub, creating the draft release
+            sh """
+              curl \
+                -H "Content-Type: application/json" \
+                -H "Authorization: token ${GITHUB_TOKEN}" \
+                -X POST \
+                -d '${requestBody}' \
+                https://api.github.com/repos/realm/react-realm-context/releases
+            """
           }
         }
+
+        // Set the email and name used when committing
+        sh 'git config --global user.email "ci@realm.io"'
+        sh 'git config --global user.name "Jenkins CI"'
+
+        // Stage the updates to the files, commit and tag the commit
+        sh 'git add package.json package-lock.json CHANGELOG.md'
+        sh "git commit -m 'Prepare version ${nextVersion}'"
+        sh "git tag ${nextVersion}"
+
+        // Restore the release notes from the template
+        sh 'cp docs/RELEASENOTES.template.md RELEASENOTES.md'
+        sh 'git add RELEASENOTES.md'
+        sh "git commit -m 'Restoring RELEASENOTES.md'"
+
+        // Push
+        script {
+          sshagent(['realm-ci-ssh']) {
+            // Push with tags
+            sh "git push --tags origin HEAD"
+          }
+        }
+      }
+    }
+
+    // Simple packaging for PRs and runs that don't prepare for releases
+    stage('Package') {
+      when {
+        changeRequest()
       }
       steps {
         // Change the version
@@ -134,73 +215,14 @@ pipeline {
       }
     }
 
-    stage('Prepare, package & publish') {
+    // More advanced packaging for commits tagged as versions
+    stage('Package & publish') {
       when {
         branch 'master'
-        tag "v*"
+        tag 'v*'
       }
 
       stages {
-        stage('Prepare') {
-          steps {
-            script {
-              // Read the current version of the package
-              packageJson = readJSON file: 'package.json'
-              versionBefore = "v${packageJson.version}"
-              // Change the version
-              nextVersion = changeVersion()
-            }
-            // Append the RELEASENOTES to the CHANGELOG
-            script {
-              releaseNotes = copyReleaseNotes(versionBefore, nextVersion)
-            }
-            // Create a draft release on GitHub
-            withCredentials([
-              string(credentialsId: 'github-release-token', variable: 'GITHUB_TOKEN')
-            ]) {
-              script {
-                requestBody = JsonOutput.toJson([
-                  tag_name: nextVersion,
-                  name: "${nextVersion.substring(1)}: ...",
-                  body: releaseNotes,
-                  draft: true,
-                ])
-                // Send a request to GitHub, creating the draft release
-                sh """
-                  curl \
-                    -H "Content-Type: application/json" \
-                    -H "Authorization: token ${GITHUB_TOKEN}" \
-                    -X POST \
-                    -d '${requestBody}' \
-                    https://api.github.com/repos/realm/react-realm-context/releases
-                """
-              }
-            }
-
-            // Set the email and name used when committing
-            sh 'git config --global user.email "ci@realm.io"'
-            sh 'git config --global user.name "Jenkins CI"'
-
-            // Stage the updates to the files, commit and tag the commit
-            sh 'git add package.json package-lock.json CHANGELOG.md'
-            sh "git commit -m 'Prepare version ${nextVersion}'"
-            sh "git tag ${nextVersion}"
-
-            // Restore the release notes from the template
-            sh 'cp docs/RELEASENOTES.template.md RELEASENOTES.md'
-            sh 'git add RELEASENOTES.md'
-            sh "git commit -m 'Restoring RELEASENOTES.md'"
-
-            // Push
-            script {
-              sshagent(['realm-ci-ssh']) {
-                // Push with tags
-                sh "git push --tags origin HEAD"
-              }
-            }
-          }
-        }
-
         stage('Package') {
           steps {
             // Package and archive the archive
