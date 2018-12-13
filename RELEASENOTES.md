@@ -7,4 +7,5 @@
 - None
 
 ## Internals
-- None
+- Running example app tests post-packaging with the actual archive.
+- Allowing unchanged release notes.

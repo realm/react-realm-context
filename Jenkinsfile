@@ -215,7 +215,8 @@ pipeline {
         // Restore the release notes from the template
         sh 'cp docs/RELEASENOTES.template.md RELEASENOTES.md'
         sh 'git add RELEASENOTES.md'
-        sh "git commit -m 'Restoring RELEASENOTES.md'"
+        // Commit the RELEASENOTES.md, which might not have changed (in rare occasions)
+        sh "git commit --allow-empty -m 'Restoring RELEASENOTES.md'"
 
         // Push to GitHub with tags
         sshagent(['realm-ci-ssh']) {
