@@ -204,9 +204,11 @@ pipeline {
         changeRequest()
       }
       steps {
-        // Change the version
         script {
-          changeVersion "${JOB_BASE_NAME}"
+          // Change the version to a prerelease if it wasn't prepared
+          if (PREPARE !== 'true') {
+            changeVersion "${JOB_BASE_NAME}"
+          }
         }
         // Package and archive the archive
         script {
@@ -216,34 +218,20 @@ pipeline {
     }
 
     // More advanced packaging for commits tagged as versions
-    stage('Package & publish') {
+    stage('Publish') {
       when {
+        beforeInput true
         branch 'master'
         tag 'v*'
       }
-
-      stages {
-        stage('Package') {
-          steps {
-            // Package and archive the archive
-            script {
-              packAndArchive()
-            }
-            // TODO: Upload the archive to NPM
-          }
-        }
-
-        stage('Publish') {
-          input {
-            message "Do you want to publish this to GitHub and NPM?"
-            id "publish"
-            ok "Publish!"
-          }
-          steps {
-            // TODO: Push archive to NPM
-            sh 'echo "Publish!"'
-          }
-        }
+      input {
+        message "Do you want to publish this to GitHub and NPM?"
+        id "publish"
+        ok "Publish!"
+      }
+      steps {
+        // TODO: Push archive to NPM
+        sh 'echo "Publish!"'
       }
     }
   }
