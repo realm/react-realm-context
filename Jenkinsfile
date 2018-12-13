@@ -83,15 +83,23 @@ pipeline {
       }
     }
 
-    stage('Lint') {
-      steps {
-        sh 'npm run lint:ts'
+    stage('Lint & build') {
+      when {
+        // Don't lint and build when preparing as they'll run again for the tagged commit afterwards
+        not { environment name: 'PREPARE', value: 'true' }
       }
-    }
+      parallel {
+        stage('Lint') {
+          steps {
+            sh 'npm run lint:ts'
+          }
+        }
 
-    stage('Build') {
-      steps {
-        sh 'npm run build'
+        stage('Build') {
+          steps {
+            sh 'npm run build'
+          }
+        }
       }
     }
 
