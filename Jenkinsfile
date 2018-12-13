@@ -198,9 +198,6 @@ pipeline {
 
     // Simple packaging for PRs and runs that don't prepare for releases
     stage('Package') {
-      when {
-        changeRequest()
-      }
       steps {
         script {
           // Change the version to a prerelease if it wasn't prepared
