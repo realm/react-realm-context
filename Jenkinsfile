@@ -52,6 +52,8 @@ def copyReleaseNotes(versionBefore, versionAfter) {
     file: 'CHANGELOG.md',
     text: "# Release ${versionAfter.substring(1)} (${today})\n\n${releaseNotes}\n\n${changeLog}",
   )
+  // Restore the release notes from the template
+  sh 'cp docs/RELEASENOTES.template.md RELEASENOTES.md'
   // Return the release notes
   return releaseNotes
 }
@@ -208,15 +210,9 @@ pipeline {
         sh 'git config --global user.name "Jenkins CI"'
 
         // Stage the updates to the files, commit and tag the commit
-        sh 'git add package.json package-lock.json CHANGELOG.md'
+        sh 'git add package.json package-lock.json CHANGELOG.md RELEASENOTES.md'
         sh "git commit -m 'Prepare version ${nextVersion}'"
         sh "git tag -f ${nextVersion}"
-
-        // Restore the release notes from the template
-        sh 'cp docs/RELEASENOTES.template.md RELEASENOTES.md'
-        sh 'git add RELEASENOTES.md'
-        // Commit the RELEASENOTES.md, which might not have changed (in rare occasions)
-        sh "git commit --allow-empty -m 'Restoring RELEASENOTES.md'"
 
         // Push to GitHub with tags
         sshagent(['realm-ci-ssh']) {
