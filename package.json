@@ -11,6 +11,7 @@
     "test": "mocha --opts config/mocha.opts src/**/*.test.tsx",
     "test:ci": "mocha --opts config/mocha.opts --reporter mocha-junit-reporter",
     "test:environments": "mocha --opts config/mocha.opts integration-tests/environments.test.ts",
+    "pretest:examples": "npm pack",
     "test:examples": "mocha --opts config/mocha.opts integration-tests/examples.test.ts"
   },
   "main": "build/index.js",
