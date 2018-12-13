@@ -1,7 +1,0 @@
--r ts-node/register
---reporter mocha-junit-reporter
---forbid-only
---exit
-src/**/*.test.tsx
-integration-tests/environments.test.ts
-integration-tests/examples.test.ts

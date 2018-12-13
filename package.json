@@ -8,10 +8,10 @@
     "lint:ts": "tslint --project tsconfig.json",
     "prepack": "npm run build",
     "start": "mocha --opts config/mocha.opts -w",
-    "test": "mocha --opts config/mocha.opts",
-    "test:ci": "mocha --opts config/mocha.ci.opts",
-    "test:integration": "mocha --opts config/mocha.integration.opts",
-    "test:in-environment": "mocha --opts config/mocha.environment.opts"
+    "test": "mocha --opts config/mocha.opts src/**/*.test.tsx",
+    "test:ci": "mocha --opts config/mocha.opts --reporter mocha-junit-reporter",
+    "test:environments": "mocha --opts config/mocha.opts integration-tests/environments.test.ts",
+    "test:examples": "mocha --opts config/mocha.opts integration-tests/examples.test.ts"
   },
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -37,7 +37,7 @@
     "prettier": "^1.12.1",
     "react": "^16.3.2",
     "react-test-renderer": "^16.3.2",
-    "realm": "^2.20.0",
+    "realm": "^2.16.0",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.17.0",

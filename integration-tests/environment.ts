@@ -1,9 +1,6 @@
 import * as cp from 'child_process';
 import * as fs from 'fs-extra';
-import * as os from 'os';
 import * as path from 'path';
-import pt from 'prepend-transform';
-import * as stream from 'stream';
 
 const ENVIRONMENTS_PATH = path.resolve(__dirname, 'environments');
 const PROJECT_PATH = path.resolve(__dirname, '..');
@@ -36,7 +33,7 @@ export const environment = (versions: IVersions) => {
       encoding: 'buffer',
       cwd: environmentPath,
       shell: 'bash',
-      stdio: ['ignore', 'ignore', 'inherit'],
+      stdio: ['ignore', 'inherit', 'inherit'],
     });
   };
 
@@ -62,6 +59,7 @@ export const environment = (versions: IVersions) => {
     ensureLinkIntoEnvironment(environmentPath, 'tsconfig.json');
     ensureLinkIntoEnvironment(environmentPath, 'config');
     ensureLinkIntoEnvironment(environmentPath, 'src');
+    ensureLinkIntoEnvironment(environmentPath, 'utils');
     // Copy the package-lock to ensure versions are locked down but it doesn't get mutated
     fs.copyFileSync(
       path.resolve(PROJECT_PATH, 'package-lock.json'),

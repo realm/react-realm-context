@@ -1,4 +1,0 @@
--r ts-node/register
---forbid-only
---exit
-src/**/*.test.tsx
