@@ -206,7 +206,7 @@ pipeline {
       steps {
         script {
           // Change the version to a prerelease if it wasn't prepared
-          if (PREPARE !== 'true') {
+          if (PREPARE != 'true') {
             changeVersion "${JOB_BASE_NAME}"
           }
         }
@@ -220,14 +220,8 @@ pipeline {
     // More advanced packaging for commits tagged as versions
     stage('Publish') {
       when {
-        beforeInput true
         branch 'master'
         tag 'v*'
-      }
-      input {
-        message "Do you want to publish this to GitHub and NPM?"
-        id "publish"
-        ok "Publish!"
       }
       steps {
         // TODO: Push archive to NPM
