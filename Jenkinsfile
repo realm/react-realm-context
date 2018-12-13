@@ -77,23 +77,21 @@ pipeline {
   }
 
   stages {
-    stage('Install, pre-check and build') {
-      stages {
-        stage('Install') {
-          steps {
-            sh 'npm install'
-          }
-        }
-        stage('Lint') {
-          steps {
-            sh 'npm run lint:ts'
-          }
-        }
-        stage('Build') {
-          steps {
-            sh 'npm run build'
-          }
-        }
+    stage('Install') {
+      steps {
+        sh 'npm install'
+      }
+    }
+
+    stage('Lint') {
+      steps {
+        sh 'npm run lint:ts'
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh 'npm run build'
       }
     }
 
