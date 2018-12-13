@@ -202,7 +202,7 @@ pipeline {
         script {
           // Change the version to a prerelease if it wasn't prepared
           if (PREPARE != 'true') {
-            changeVersion "${JOB_BASE_NAME}"
+            changeVersion "${JOB_BASE_NAME}-${BUILD_NUMBER}"
           }
         }
         // Package and archive the archive
