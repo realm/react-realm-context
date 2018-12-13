@@ -121,7 +121,17 @@ pipeline {
         }
         stage('Example apps') {
           steps {
-            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts'
+            // See https://devops.stackexchange.com/questions/3073/how-to-properly-achieve-dynamic-parallel-action-with-a-declarative-pipeline
+            script {
+              def tests = [:]
+              for (f in findFiles(glob: 'examples/*')) {
+                tests["${f}"] = {
+                  echo '${f}'
+                }
+              }
+              parallel tests
+            }
+            // sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts'
           }
         }
       }
