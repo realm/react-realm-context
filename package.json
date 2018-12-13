@@ -1,6 +1,6 @@
 {
   "name": "react-realm-context",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Components that simplifies using Realm with React.js",
   "scripts": {
     "build": "tsc -p config/tsconfig.build.json",
