@@ -1,3 +1,17 @@
+# Release 0.1.4 (2018-12-13)
+
+[Changes since v0.1.3](https://github.com/realm/react-realm-context/compare/v0.1.3...v0.1.4)
+
+## Enhancements
+- None
+
+## Fixed
+- None
+
+## Internals
+- None
+
+
 # Release 0.1.3 (2018-12-13)
 
 [Changes since v0.1.2](https://github.com/realm/react-realm-context/compare/v0.1.2...v0.1.3)
