@@ -1,3 +1,17 @@
+# Release 0.1.1 (2018-12-13)
+
+[Changes since v0.1.0](https://github.com/realm/react-realm-context/compare/v0.1.0...v0.1.1)
+
+## Enhancements
+- None
+
+## Fixed
+- None
+
+## Internals
+- Initial release of React Realm Context
+
+
 # Release 0.1.0 (2018-12-12)
 
 This is the first release of the React Realm Context library.
