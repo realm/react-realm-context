@@ -1,5 +1,7 @@
 #!groovy
 
+import groovy.json.JsonOutput
+
 // Changes the version in the package.json and package-lock.json
 def changeVersion(String preId = "") {
   // Determine the upcoming release type
@@ -22,7 +24,7 @@ def changeVersion(String preId = "") {
     ).trim()
   }
   // Set the build name
-  currentBuild.displayName = nextVersion
+  currentBuild.displayName += ": ${nextVersion}"
   return nextVersion
 }
 
@@ -59,7 +61,9 @@ pipeline {
     docker {
       image 'node:8'
       label 'docker'
-      args "-e HOME=${env.WORKSPACE} -v /etc/passwd:/etc/passwd:ro"
+      // /etc/passwd is mapped so a jenkins users is available from within the container
+      // ~/.ssh is mapped to allow pushing to GitHub via SSH
+      args '-e "HOME=${WORKSPACE}" -v /etc/passwd:/etc/passwd:ro -v /home/jenkins/.ssh:/home/jenkins/.ssh:ro'
     }
   }
 
@@ -79,6 +83,7 @@ pipeline {
   stages {
     stage('Install') {
       steps {
+        // Perform the install
         sh 'npm install'
       }
     }
@@ -187,25 +192,28 @@ pipeline {
         // Stage the updates to the files, commit and tag the commit
         sh 'git add package.json package-lock.json CHANGELOG.md'
         sh "git commit -m 'Prepare version ${nextVersion}'"
-        sh "git tag ${nextVersion}"
+        sh "git tag -f ${nextVersion}"
 
         // Restore the release notes from the template
         sh 'cp docs/RELEASENOTES.template.md RELEASENOTES.md'
         sh 'git add RELEASENOTES.md'
         sh "git commit -m 'Restoring RELEASENOTES.md'"
 
-        // Push
-        script {
-          sshagent(['realm-ci-ssh']) {
-            // Push with tags
-            sh "git push --tags origin HEAD"
-          }
+        // Set the origin to ensure the push will happen via SSH
+        sh 'git remote set-url origin git@github.com:realm/react-realm-context.git'
+        // Push to GitHub with tags
+        sshagent(['realm-ci-ssh']) {
+          sh "git push --tags origin"
         }
       }
     }
 
     // Simple packaging for PRs and runs that don't prepare for releases
     stage('Package') {
+      when {
+        // Don't run tests when preparing as they'll run again for the tagged commit afterwards
+        not { environment name: 'PREPARE', value: 'true' }
+      }
       steps {
         script {
           // Change the version to a prerelease if it wasn't prepared
