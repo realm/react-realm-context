@@ -17,7 +17,7 @@ def changeVersion(String preId = "") {
   ).trim()
   // If a preid is specified, perform a pre-release afterwards
   if (preId) {
-    // Update the version of the package
+    // Update the version of the package again
     sh "npm version prerelease --no-git-tag-version --preid=${preId}"
   }
   // Set the build name
@@ -97,7 +97,7 @@ pipeline {
         sh 'rm -f react-realm-context-*.tgz'
         // Change the version
         script {
-          changeVersion JOB_BASE_NAME
+          changeVersion "${JOB_BASE_NAME}.${BUILD_NUMBER}"
         }
         // Ignore the prepack running "build" again
         sh 'npm pack --ignore-scripts'
