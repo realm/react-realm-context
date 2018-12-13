@@ -12,7 +12,7 @@ def changeVersion(String preId = "") {
   ).trim()
   // Ask NPM to update the package json and lock and read the next version
   nextVersion = sh(
-    script: "npm version --no-git-tag-version ${nextVersionType}",
+    script: "npm version ${nextVersionType} --no-git-tag-version",
     returnStdout: true,
   ).trim()
   // If a preid is specified, perform a pre-release afterwards
@@ -22,6 +22,34 @@ def changeVersion(String preId = "") {
   }
   // Set the build name
   currentBuild.displayName = nextVersion
+}
+
+def packAndArchive() {
+  // Remove any archives produced by the tests
+  sh 'rm -f react-realm-context-*.tgz'
+  // Ignore the prepack running "build" again
+  sh 'npm pack --ignore-scripts'
+  // Archive the archive
+  archiveArtifacts 'react-realm-context-*.tgz'
+}
+
+def copyReleaseNotes() {
+  // Read the release notes and replace in any variables
+  releaseNotes = readFile 'RELEASENOTES.md'
+  releaseNotes = releaseNotes
+    .replaceAll("\\{PREVIOUS_VERSION\\}", versionBefore)
+    .replaceAll("\\{CURRENT_VERSION\\}", nextVersion)
+
+  // Get todays date
+  today = new Date().format('yyyy-MM-dd')
+  // Append the release notes to the change log
+  changeLog = readFile 'CHANGELOG.md'
+  writeFile(
+    file: 'CHANGELOG.md',
+    text: "# Release ${nextVersion.substring(1)} (${today})\n\n${releaseNotes}\n\n${changeLog}",
+  )
+  // Return the release notes
+  return releaseNotes
 }
 
 pipeline {
@@ -93,16 +121,14 @@ pipeline {
         }
       }
       steps {
-        // Remove any archives produced by the tests
-        sh 'rm -f react-realm-context-*.tgz'
         // Change the version
         script {
-          changeVersion "${JOB_BASE_NAME}.${BUILD_NUMBER}"
+          changeVersion "${JOB_BASE_NAME}-${BUILD_NUMBER}"
         }
-        // Ignore the prepack running "build" again
-        sh 'npm pack --ignore-scripts'
-        // Archive the archive
-        archiveArtifacts 'react-realm-context-*.tgz'
+        // Package and archive the archive
+        script {
+          packAndArchive()
+        }
       }
     }
 
@@ -116,24 +142,11 @@ pipeline {
         stage('Prepare') {
           steps {
             script {
-              changeVersion
+              changeVersion()
             }
             // Append the RELEASENOTES to the CHANGELOG
             script {
-              // Read the release notes and replace in any variables
-              releaseNotes = readFile 'RELEASENOTES.md'
-              releaseNotes = releaseNotes
-                .replaceAll("\\{PREVIOUS_VERSION\\}", versionBefore)
-                .replaceAll("\\{CURRENT_VERSION\\}", nextVersion)
-
-              // Get todays date
-              today = new Date().format('yyyy-MM-dd')
-              // Append the release notes to the change log
-              changeLog = readFile 'CHANGELOG.md'
-              writeFile(
-                file: 'CHANGELOG.md',
-                text: "# Release ${nextVersion.substring(1)} (${today})\n\n${releaseNotes}\n\n${changeLog}",
-              )
+              releaseNotes = copyReleaseNotes()
             }
             // Create a draft release on GitHub
             withCredentials([
@@ -157,8 +170,6 @@ pipeline {
                 """
               }
             }
-
-            // Commit to git and push to GitHub
 
             // Set the email and name used when committing
             sh 'git config --global user.email "ci@realm.io"'
@@ -186,12 +197,10 @@ pipeline {
 
         stage('Package') {
           steps {
-            // Remove any archives produced by the tests
-            sh 'rm -f react-realm-context-*.tgz'
-            // Ignore the prepack running "build" again
-            sh 'npm pack --ignore-scripts'
-            // Archive the archive
-            archiveArtifacts 'react-realm-context-*.tgz'
+            // Package and archive the archive
+            script {
+              packAndArchive()
+            }
             // TODO: Upload the archive to NPM
           }
         }
