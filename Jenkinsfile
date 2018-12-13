@@ -2,26 +2,28 @@
 
 // Changes the version in the package.json and package-lock.json
 def changeVersion(String preId = "") {
-  // Read the current version of the package
-  packageJson = readJSON file: 'package.json'
-  versionBefore = "v${packageJson.version}"
   // Determine the upcoming release type
   nextVersionType = sh(
     script: "node ./scripts/next-version.js",
     returnStdout: true,
   ).trim()
   // Ask NPM to update the package json and lock and read the next version
-  nextVersion = sh(
-    script: "npm version ${nextVersionType} --no-git-tag-version",
-    returnStdout: true,
-  ).trim()
   // If a preid is specified, perform a pre-release afterwards
   if (preId) {
     // Update the version of the package again
-    sh "npm version prerelease --no-git-tag-version --preid=${preId}"
+    nextVersion = sh(
+      script: "npm version pre${nextVersionType} --no-git-tag-version --preid=${preId}",
+      returnStdout: true,
+    ).trim()
+  } else {
+    nextVersion = sh(
+      script: "npm version ${nextVersionType} --no-git-tag-version",
+      returnStdout: true,
+    ).trim()
   }
   // Set the build name
   currentBuild.displayName = nextVersion
+  return nextVersion
 }
 
 def packAndArchive() {
@@ -33,12 +35,12 @@ def packAndArchive() {
   archiveArtifacts 'react-realm-context-*.tgz'
 }
 
-def copyReleaseNotes() {
+def copyReleaseNotes(versionBefore, versionAfter) {
   // Read the release notes and replace in any variables
   releaseNotes = readFile 'RELEASENOTES.md'
   releaseNotes = releaseNotes
     .replaceAll("\\{PREVIOUS_VERSION\\}", versionBefore)
-    .replaceAll("\\{CURRENT_VERSION\\}", nextVersion)
+    .replaceAll("\\{CURRENT_VERSION\\}", versionAfter)
 
   // Get todays date
   today = new Date().format('yyyy-MM-dd')
@@ -46,7 +48,7 @@ def copyReleaseNotes() {
   changeLog = readFile 'CHANGELOG.md'
   writeFile(
     file: 'CHANGELOG.md',
-    text: "# Release ${nextVersion.substring(1)} (${today})\n\n${releaseNotes}\n\n${changeLog}",
+    text: "# Release ${versionAfter.substring(1)} (${today})\n\n${releaseNotes}\n\n${changeLog}",
   )
   // Return the release notes
   return releaseNotes
@@ -123,7 +125,7 @@ pipeline {
       steps {
         // Change the version
         script {
-          changeVersion "${JOB_BASE_NAME}-${BUILD_NUMBER}"
+          changeVersion "${JOB_BASE_NAME}"
         }
         // Package and archive the archive
         script {
@@ -142,11 +144,15 @@ pipeline {
         stage('Prepare') {
           steps {
             script {
-              changeVersion()
+              // Read the current version of the package
+              packageJson = readJSON file: 'package.json'
+              versionBefore = "v${packageJson.version}"
+              // Change the version
+              nextVersion = changeVersion()
             }
             // Append the RELEASENOTES to the CHANGELOG
             script {
-              releaseNotes = copyReleaseNotes()
+              releaseNotes = copyReleaseNotes(versionBefore, nextVersion)
             }
             // Create a draft release on GitHub
             withCredentials([
