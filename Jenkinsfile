@@ -1,5 +1,29 @@
 #!groovy
 
+// Changes the version in the package.json and package-lock.json
+def changeVersion(String preId = "") {
+  // Read the current version of the package
+  packageJson = readJSON file: 'package.json'
+  versionBefore = "v${packageJson.version}"
+  // Determine the upcoming release type
+  nextVersionType = sh(
+    script: "node ./scripts/next-version.js",
+    returnStdout: true,
+  ).trim()
+  // Ask NPM to update the package json and lock and read the next version
+  nextVersion = sh(
+    script: "npm version --no-git-tag-version ${nextVersionType}",
+    returnStdout: true,
+  ).trim()
+  // If a preid is specified, perform a pre-release afterwards
+  if (preId) {
+    // Update the version of the package
+    sh "npm version prerelease --no-git-tag-version --preid=${preId}"
+  }
+  // Set the build name
+  currentBuild.displayName = nextVersion
+}
+
 pipeline {
   agent {
     docker {
@@ -71,10 +95,10 @@ pipeline {
       steps {
         // Remove any archives produced by the tests
         sh 'rm -f react-realm-context-*.tgz'
-        // Restore the package and package lock (might be modified by the tests)
-        sh 'git checkout package.json package-lock.json'
-        // Update the version of the package
-        sh "npm version prerelease --preid=${BUILD_TAG}"
+        // Change the version
+        script {
+          changeVersion JOB_BASE_NAME
+        }
         // Ignore the prepack running "build" again
         sh 'npm pack --ignore-scripts'
         // Archive the archive
@@ -91,23 +115,8 @@ pipeline {
       stages {
         stage('Prepare') {
           steps {
-            // Change the version in the package.json and package-lock.json
             script {
-              // Read the current version of the package
-              packageJson = readJSON file: 'package.json'
-              versionBefore = "v${packageJson.version}"
-              // Determine the upcoming release type
-              nextVersionType = sh(
-                script: "node ./scripts/next-version.js",
-                returnStdout: true,
-              ).trim()
-              // Ask NPM to update the package json and lock and read the next version
-              nextVersion = sh(
-                script: "npm version --no-git-tag-version ${nextVersionType}",
-                returnStdout: true,
-              ).trim()
-              // Set the build name
-              currentBuild.displayName = nextVersion
+              changeVersion
             }
             // Append the RELEASENOTES to the CHANGELOG
             script {
