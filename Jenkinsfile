@@ -245,9 +245,16 @@ pipeline {
         tag "v*"
       }
       steps {
-        sh 'echo "Publish!"'
-        // TODO: Push archive to NPM
-        // TODO: Upload artifacts to GitHub and publish release
+        // Publish archive to NPM
+        withCredentials([
+          file(
+            credentialsId: 'npm-registry-npmrc',
+            variable: 'NPM_CONFIG_USERCONFIG',
+          )
+        ]) {
+          sh 'npm publish react-realm-context-*.tgz --dry-run'
+        }
+        // Upload artifacts to GitHub and publish release
         withCredentials([
           string(credentialsId: 'github-release-token', variable: 'GITHUB_TOKEN')
         ]) {
