@@ -252,7 +252,7 @@ pipeline {
             variable: 'NPM_CONFIG_USERCONFIG',
           )
         ]) {
-          sh 'npm publish react-realm-context-*.tgz --dry-run'
+          sh 'npm publish react-realm-context-*.tgz'
         }
         // Upload artifacts to GitHub and publish release
         withCredentials([
