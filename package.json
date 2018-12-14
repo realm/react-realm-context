@@ -24,11 +24,13 @@
   "repository": "https://github.com/realm/react-realm-context",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@octokit/rest": "^16.2.0",
     "@types/fs-extra": "^5.0.2",
     "@types/mocha": "^5.2.0",
     "@types/node": "^10.1.0",
     "@types/react": "^16.3.14",
     "@types/react-test-renderer": "^16.0.1",
+    "commander": "^2.19.0",
     "create-react-app": "^1.5.2",
     "fs-extra": "^6.0.1",
     "hoist-non-react-statics": "^2.5.0",

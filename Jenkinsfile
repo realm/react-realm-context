@@ -43,6 +43,8 @@ def copyReleaseNotes(versionBefore, versionAfter) {
   releaseNotes = releaseNotes
     .replaceAll("\\{PREVIOUS_VERSION\\}", versionBefore)
     .replaceAll("\\{CURRENT_VERSION\\}", versionAfter)
+  // Write back the release notes
+  writeFile file: 'RELEASENOTES.md', text: releaseNotes
 
   // Get todays date
   today = new Date().format('yyyy-MM-dd')
@@ -54,8 +56,13 @@ def copyReleaseNotes(versionBefore, versionAfter) {
   )
   // Restore the release notes from the template
   sh 'cp docs/RELEASENOTES.template.md RELEASENOTES.md'
-  // Return the release notes
-  return releaseNotes
+}
+
+def testExampleApp(String app) {
+  dir("examples/$app") {
+    sh 'npm install ../../react-realm-context-*.tgz --no-save'
+    sh 'npm test -- --forceExit'
+  }
 }
 
 pipeline {
@@ -69,7 +76,16 @@ pipeline {
     }
   }
 
+  environment {
+    // Tells Jest (used for example app tests) to run non-interactive
+    CI = true
+    // Parameters used by the github releases script
+    GITHUB_OWNER="realm"
+    GITHUB_REPO="react-realm-context"
+  }
+
   options {
+    // Prevent checking out multiple times
     skipDefaultCheckout()
   }
 
@@ -100,10 +116,16 @@ pipeline {
           userRemoteConfigs: [[
             credentialsId: 'realm-ci-ssh',
             name: 'origin',
-            refspec: '+refs/tags/*:refs/remotes/origin/tags/* +refs/heads/*:refs/remotes/origin/*',
             url: 'git@github.com:realm/react-realm-context.git'
           ]]
         ])
+        // Setting the TAG_NAME env as this is not happening when skipping default checkout.
+        script {
+          env.TAG_NAME = sh(
+            script: 'git tag --points-at HEAD',
+            returnStdout: true,
+          ).trim()
+        }
       }
     }
 
@@ -116,7 +138,7 @@ pipeline {
 
     stage('Lint & build') {
       when {
-        // Don't lint and build when preparing as they'll run again for the tagged commit afterwards
+        // Don't do this when preparing for a release
         not { environment name: 'PREPARE', value: 'true' }
       }
       parallel {
@@ -136,18 +158,18 @@ pipeline {
 
     stage('Pre-package tests') {
       when {
-        // Don't run tests when preparing as they'll run again for the tagged commit afterwards
+        // Don't do this when preparing for a release
         not { environment name: 'PREPARE', value: 'true' }
       }
       parallel {
         stage('Unit tests') {
           steps {
-            sh 'MOCHA_FILE=unit-test-results.xml npm run test:ci -- src/**/*.test.tsx'
+            sh 'MOCHA_FILE=pre-unit-test-results.xml npm run test:ci -- src/**/*.test.tsx'
           }
         }
         stage('Environment tests') {
           steps {
-            sh 'MOCHA_FILE=environments-test-results.xml npm run test:ci -- integration-tests/environments.test.ts'
+            sh 'MOCHA_FILE=pre-environments-test-results.xml npm run test:ci -- integration-tests/environments.test.ts'
           }
         }
       }
@@ -156,8 +178,87 @@ pipeline {
           junit(
             allowEmptyResults: true,
             keepLongStdio: true,
-            testResults: '*-test-results.xml'
+            testResults: 'pre-*-test-results.xml'
           )
+        }
+      }
+    }
+
+    // Simple packaging for PRs and runs that don't prepare for releases
+    stage('Package') {
+      when {
+        // Don't do this when preparing for a release
+        not { environment name: 'PREPARE', value: 'true' }
+      }
+      steps {
+        script {
+          if (TAG_NAME && TAG_NAME.startsWith("v")) {
+            // Update the build display name
+            currentBuild.displayName += ": ${TAG_NAME} (publish)"
+          } else {
+            // Change the version to a prerelease if it's not preparing or is a release
+            changeVersion "${JOB_BASE_NAME}-${BUILD_NUMBER}"
+          }
+        }
+        // Package and archive the archive
+        script {
+          packAndArchive()
+        }
+      }
+    }
+
+    stage('Post-packaging tests') {
+      when {
+        // Don't do this when preparing for a release
+        not { environment name: 'PREPARE', value: 'true' }
+      }
+      parallel {
+        stage('Example #1') {
+          steps {
+            script { testExampleApp('initializer-and-query') }
+          }
+        }
+        stage('Example #2') {
+          steps {
+            script { testExampleApp('multiple-realms') }
+          }
+        }
+        stage('Example #3') {
+          steps {
+            script { testExampleApp('simple-context') }
+          }
+        }
+        stage('Example #4') {
+          steps {
+            script { testExampleApp('simple-render-props') }
+          }
+        }
+      }
+    }
+
+    // More advanced packaging for commits tagged as versions
+    stage('Publish') {
+      when {
+        // Don't do this when preparing for a release
+        not { environment name: 'PREPARE', value: 'true' }
+        // Check if a tag starting with a v (for version) is pointing at this commit
+        tag "v*"
+      }
+      steps {
+        sh 'echo "Publish!"'
+        // TODO: Push archive to NPM
+        // TODO: Upload artifacts to GitHub and publish release
+        withCredentials([
+          string(credentialsId: 'github-release-token', variable: 'GITHUB_TOKEN')
+        ]) {
+          script {
+            for (file in findFiles(glob: 'react-realm-context-*.tgz')) {
+              sh "node scripts/github-releases upload-asset $TAG_NAME $file"
+            }
+          }
+          script {
+            sh "node scripts/github-releases publish $TAG_NAME"
+          }
         }
       }
     }
@@ -178,31 +279,19 @@ pipeline {
           versionBefore = "v${packageJson.version}"
           // Change the version
           nextVersion = changeVersion()
+          // Add to the displa name of the build job that we're preparing a release
+          currentBuild.displayName += " (prepare)"
         }
         // Append the RELEASENOTES to the CHANGELOG
         script {
-          releaseNotes = copyReleaseNotes(versionBefore, nextVersion)
+          copyReleaseNotes(versionBefore, nextVersion)
         }
         // Create a draft release on GitHub
-        withCredentials([
-          string(credentialsId: 'github-release-token', variable: 'GITHUB_TOKEN')
-        ]) {
-          script {
-            requestBody = JsonOutput.toJson([
-              tag_name: nextVersion,
-              name: "${nextVersion.substring(1)}: ...",
-              body: releaseNotes,
-              draft: true,
-            ])
-            // Send a request to GitHub, creating the draft release
-            sh """
-              curl \
-                -H "Content-Type: application/json" \
-                -H "Authorization: token ${GITHUB_TOKEN}" \
-                -X POST \
-                -d '${requestBody}' \
-                https://api.github.com/repos/realm/react-realm-context/releases
-            """
+        script {
+          withCredentials([
+            string(credentialsId: 'github-release-token', variable: 'GITHUB_TOKEN')
+          ]) {
+            sh "node scripts/github-releases create-draft $nextVersion RELEASENOTES.md"
           }
         }
 
@@ -219,77 +308,6 @@ pipeline {
         sshagent(['realm-ci-ssh']) {
           sh "git push --tags origin HEAD"
         }
-      }
-    }
-
-    // Simple packaging for PRs and runs that don't prepare for releases
-    stage('Package') {
-      when {
-        // Don't run tests when preparing as they'll run again for the tagged commit afterwards
-        not { environment name: 'PREPARE', value: 'true' }
-      }
-      steps {
-        script {
-          // Change the version to a prerelease if it wasn't prepared
-          if (PREPARE != 'true') {
-            changeVersion "${JOB_BASE_NAME}-${BUILD_NUMBER}"
-          }
-        }
-        // Package and archive the archive
-        script {
-          packAndArchive()
-        }
-      }
-    }
-
-    stage('Post-packaging tests') {
-      when {
-        // Don't run tests when preparing as they'll run again for the tagged commit afterwards
-        not { environment name: 'PREPARE', value: 'true' }
-      }
-      parallel {
-        stage('Example #1') {
-          steps {
-            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts --grep="initializer-and-query"'
-          }
-        }
-        stage('Example #2') {
-          steps {
-            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts --grep="multiple-realms"'
-          }
-        }
-        stage('Example #3') {
-          steps {
-            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts --grep="simple-context"'
-          }
-        }
-        stage('Example #4') {
-          steps {
-            sh 'MOCHA_FILE=examples-test-results.xml npm run test:ci -- integration-tests/examples.test.ts --grep="simple-render-props"'
-          }
-        }
-      }
-      post {
-        always {
-          junit(
-            allowEmptyResults: true,
-            keepLongStdio: true,
-            testResults: '*-test-results.xml'
-          )
-        }
-      }
-    }
-
-    // More advanced packaging for commits tagged as versions
-    stage('Publish') {
-      when {
-        branch 'master'
-        tag 'v*'
-      }
-      steps {
-        sh 'echo "Publish!"'
-        // TODO: Push archive to NPM
-        // TODO: Upload artifacts to GitHub and publish release
       }
     }
   }
