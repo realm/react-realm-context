@@ -5,6 +5,9 @@ node_modules/
 build/
 react-realm-context-*.tgz
 
+# Documentation
+generated-docs/
+
 # Test results
 test-results.xml
 

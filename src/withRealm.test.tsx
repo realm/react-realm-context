@@ -24,8 +24,9 @@ import { IPerson, schema } from '../utils/persons-realm';
 
 import { RealmConsumer, RealmInitializer, RealmProvider, withRealm } from '.';
 
-// This test creates more than one class
+// This test creates more than one class and doesn't document their public methods.
 // tslint:disable:max-classes-per-file
+// tslint:disable:completed-docs
 
 describe('withRealm injector', () => {
   let tree: renderer.ReactTestRenderer;
@@ -43,6 +44,7 @@ describe('withRealm injector', () => {
       greeting: string;
     }
 
+    // tslint:disable-next-line:complete-docs
     class SomeComponent extends React.Component<ISomeComponentProps> {
       public render() {
         const names = this.props.realm

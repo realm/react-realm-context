@@ -1,4 +1,4 @@
-import { environment, IVersions } from './environment';
+import { environment, IEnvironmentVersions } from './environment';
 
 const VERSIONS = {
   realm: ['2.16.0', '2.21.0'],
@@ -6,7 +6,7 @@ const VERSIONS = {
 };
 
 const versionPermutations = () => {
-  const result: IVersions[] = [];
+  const result: IEnvironmentVersions[] = [];
   for (const realmVersion of VERSIONS.realm) {
     for (const reactVersion of VERSIONS.react) {
       result.push({

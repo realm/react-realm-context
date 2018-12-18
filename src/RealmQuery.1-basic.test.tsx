@@ -33,11 +33,12 @@ describe('RealmQuery (basic)', () => {
   });
 
   it('will pass results as prop', done => {
-    const called = false;
     tree = renderer.create(
       <RealmProvider schema={schema}>
         <RealmQuery type="Person">
           {({ results }) => {
+            assert(results);
+            assert.equal(results.length, 0);
             return 'hi from render prop!';
           }}
         </RealmQuery>
@@ -45,12 +46,11 @@ describe('RealmQuery (basic)', () => {
     );
     // Asserting the tree matches the string which was returned
     assert.equal(tree.toJSON(), 'hi from render prop!');
-    process.nextTick(() => {
-      done();
-    });
+    tree.unmount();
+    done();
   });
 
-  it('will work together with a Consumer', done => {
+  it('will work with a Consumer', done => {
     let step = 0;
 
     const finish = (realm: Realm) => {

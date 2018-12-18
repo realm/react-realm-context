@@ -25,23 +25,40 @@ interface IRealmConnectionState {
   connectionState: Realm.Sync.ConnectionState;
 }
 
+/**
+ * Props passed to a RealmConnection component.
+ */
 export interface IRealmConnectionProps {
   children: (connectionState: Realm.Sync.ConnectionState) => React.ReactChild;
 }
 
+/**
+ * Generates a RealmConnection wrapping a context consumer.
+ * Use `createContext` instead of using this directly.
+ */
 export const generateRealmConnection = (
   WrappedConsumer: React.Consumer<IRealmContext>,
 ): React.ComponentType<IRealmConnectionProps> => {
+  /**
+   * Adds a listener to the connection state (using `syncSession.addConnectionNotification`) and renders the function
+   * passed as children, like a [render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render).
+   */
   class RealmConnection extends React.Component<
     IRealmConnectionProps,
     IRealmConnectionState
   > {
+    /**
+     * The state stores the latest known state of connection, defaults to disconnected.
+     */
     public state: IRealmConnectionState = {
       connectionState: Realm.Sync.ConnectionState.Disconnected,
     };
 
     private syncSession: Realm.Sync.Session;
 
+    /**
+     * Renders the component.
+     */
     public render() {
       return <WrappedConsumer>{this.renderContext}</WrappedConsumer>;
     }

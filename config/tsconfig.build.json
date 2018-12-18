@@ -8,5 +8,17 @@
   ],
   "exclude": [
     "../src/**/*.test.tsx"
-  ]
+  ],
+  "typedocOptions": {
+    "mode": "file",
+    "out": "generated-docs",
+    "excludePrivate": true,
+    "preserveConstEnums": true,
+    "stripInternal": true,
+    "hideGenerator": true,
+    "readme": "none",
+    "includeDeclarations": false,
+    "name": "React Realm Context",
+    "inlineSourceMap": true
+  }
 }

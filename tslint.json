@@ -9,6 +9,20 @@
     "tslint-plugin-prettier"
   ],
   "rules": {
+    "completed-docs": [
+      true,
+      {
+        "classes": { "visibilities": ["exported"] },
+        "enums": { "visibilities": ["exported"] },
+        "enum-members": { "visibilities": ["exported"] },
+        "functions": { "visibilities": ["exported"] },
+        "interfaces": { "visibilities": ["exported"] },
+        "properties": { "privacies": ["public", "protected"] },
+        "methods": { "privacies": ["public", "protected"] },
+        "types": { "visibilities": ["exported"] },
+        "variables": { "visibilities": ["exported"] }
+      }
+    ],
     "object-literal-sort-keys": false,
     "jsx-boolean-value": false,
     "jsx-no-lambda": false,

@@ -21,15 +21,26 @@ import * as Realm from 'realm';
 
 import { IRealmContext } from '.';
 
-export interface IValue<T> {
+interface IValue<T> {
   results: Realm.Results<T>;
   realm: Realm;
 }
-export type QueryChild<T> = (value: IValue<T>) => React.ReactChild;
 
+type QueryChild<T> = (value: IValue<T>) => React.ReactChild;
+
+/**
+ * Something to filter the results by.
+ */
 export type Filtering = string | any[];
+
+/**
+ * Something to sort the results by.
+ */
 export type Sorting = string | Realm.SortDescriptor | Realm.SortDescriptor[];
 
+/**
+ * Props passed to a RealmQuery component.
+ */
 export interface IRealmQueryProps<T> {
   children: QueryChild<T>;
   type: string;
@@ -37,6 +48,10 @@ export interface IRealmQueryProps<T> {
   sort?: Sorting;
 }
 
+/**
+ * Generates a RealmQuery wrapping a context consumer.
+ * Use `createContext` instead of using this directly.
+ */
 export const generateRealmQuery = (
   WrappedConsumer: React.Consumer<IRealmContext>,
 ): React.ComponentType<IRealmQueryProps<any>> => {
@@ -54,6 +69,9 @@ export const generateRealmQuery = (
       this.forgetRealm();
     }
 
+    /**
+     * Renders the component.
+     */
     public render() {
       return <WrappedConsumer>{this.renderContext}</WrappedConsumer>;
     }

@@ -22,7 +22,7 @@ import * as renderer from 'react-test-renderer';
 
 import { IPerson, schema } from '../utils/persons-realm';
 
-import { RealmConsumer, RealmProvider, RealmQuery } from '.';
+import { RealmProvider, RealmQuery } from '.';
 
 describe('RealmQuery (filter)', () => {
   let tree: renderer.ReactTestRenderer;

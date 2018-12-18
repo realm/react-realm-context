@@ -5,12 +5,15 @@ import * as path from 'path';
 const ENVIRONMENTS_PATH = path.resolve(__dirname, 'environments');
 const PROJECT_PATH = path.resolve(__dirname, '..');
 
-export interface IVersions {
+/**
+ * Specific versions of the components in an environment.
+ */
+export interface IEnvironmentVersions {
   realm: string;
   react: string;
 }
 
-const getEnvironmentPath = (versions: IVersions) => {
+const getEnvironmentPath = (versions: IEnvironmentVersions) => {
   return path.resolve(
     ENVIRONMENTS_PATH,
     [`realm-${versions.realm}`, `react-${versions.react}`].join('-'),
@@ -24,7 +27,10 @@ const ensureLinkIntoEnvironment = (environmentPath: string, p: string) => {
   );
 };
 
-export const environment = (versions: IVersions) => {
+/**
+ * Create a wrapper for a specific environment, including functions to execute in it, remove it and ensure it exists.
+ */
+export const environment = (versions: IEnvironmentVersions) => {
   const environmentPath = getEnvironmentPath(versions);
 
   const exec = (command: string, options?: cp.ExecOptions) => {

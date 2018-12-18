@@ -6,6 +6,9 @@
     "noImplicitAny": true,
     "declaration": true
   },
+  "files": [
+    "src/index.tsx"
+  ],
   "include": [
     "src/**/*.tsx",
     "utils/*.ts",
