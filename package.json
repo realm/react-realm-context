@@ -34,6 +34,7 @@
     "commander": "^2.19.0",
     "create-react-app": "^1.5.2",
     "fs-extra": "^6.0.1",
+    "gh-pages": "^2.0.1",
     "hoist-non-react-statics": "^2.5.0",
     "mocha": "^5.1.1",
     "mocha-junit-reporter": "^1.17.0",
