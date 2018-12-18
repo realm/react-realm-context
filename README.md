@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/kraenhansen/react-realm-context/raw/master/docs/logo.svg?sanitize=true" alt="React Realm Context"/>
+  <img src="https://github.com/realm/react-realm-context/raw/master/docs/logo.svg?sanitize=true" alt="React Realm Context"/>
 </p>
 
 <p align="center">
