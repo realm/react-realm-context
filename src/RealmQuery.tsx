@@ -50,7 +50,8 @@ export interface IRealmQueryProps<T> {
 
 /**
  * Generates a RealmQuery wrapping a context consumer.
- * Use `createContext` instead of using this directly.
+ *
+ * Use {@link createRealmContext} or the default RealmQuery instead of calling this directly.
  */
 export const generateRealmQuery = (
   WrappedConsumer: React.Consumer<IRealmContext>,

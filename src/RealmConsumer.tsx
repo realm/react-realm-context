@@ -32,7 +32,8 @@ export interface IRealmConsumerProps {
 
 /**
  * Generates a RealmConsumer wrapping a context consumer.
- * Use `createContext` instead of using this directly.
+ *
+ * Use {@link createRealmContext} or the default RealmConsumer instead of calling this directly.
  */
 export const generateRealmConsumer = (
   WrappedConsumer: React.Consumer<IRealmContext>,

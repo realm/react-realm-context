@@ -30,7 +30,8 @@ export interface IRealmInitializerProps {
 
 /**
  * Generates a RealmInitializer wrapping a context consumer.
- * Use `createContext` instead of using this directly.
+ *
+ * Use {@link createRealmContext} or the default RealmInitializer instead of calling this directly.
  */
 export const generateRealmInitializer = (
   WrappedConsumer: React.Consumer<IRealmContext>,

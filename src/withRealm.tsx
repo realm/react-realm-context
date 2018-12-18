@@ -30,7 +30,8 @@ type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 
 /**
  * Generates a withRealm function wrapping a context consumer.
- * Use `createContext` instead of using this directly.
+ *
+ * Use {@link createRealmContext} or the default withRealm instead of calling this directly.
  */
 export function generateWithRealm(
   Consumer: React.ComponentType<IRealmConsumerProps>,

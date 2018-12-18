@@ -33,7 +33,8 @@ export interface IRealmProviderProps extends Realm.Configuration {
 
 /**
  * Generates a RealmProvider wrapping a context provider.
- * Use `createContext` instead of using this directly.
+ *
+ * Use {@link createRealmContext} or the default RealmProvider instead of calling this directly.
  */
 export const generateRealmProvider = (
   WrappedProvider: React.Provider<IRealmContext>,
