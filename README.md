@@ -1,4 +1,12 @@
-# React Realm Context
+<p align="center">
+  <img src="https://github.com/kraenhansen/react-realm-context/raw/master/docs/logo.svg?sanitize=true" alt="React Realm Context"/>
+</p>
+
+<p align="center">
+  React Realm Context
+</p>
+
+---
 
 A more React'y experience of Realm:
 
