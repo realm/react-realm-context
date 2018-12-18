@@ -1,12 +1,10 @@
 <p align="center">
-  <img src="https://github.com/realm/react-realm-context/raw/master/docs/logo.svg?sanitize=true" alt="React Realm Context"/>
+  <img height="140" src="https://github.com/realm/react-realm-context/raw/master/docs/logo.svg?sanitize=true" alt="React Realm Context"/>
 </p>
 
-<p align="center">
+<h1 align="center">
   React Realm Context
-</p>
-
----
+</h1>
 
 A more React'y experience of Realm:
 
