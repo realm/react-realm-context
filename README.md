@@ -1,4 +1,12 @@
-# React Realm Context
+<p align="center">
+  <img src="https://github.com/kraenhansen/react-realm-context/raw/master/docs/logo.svg?sanitize=true" alt="React Realm Context"/>
+</p>
+
+<p align="center">
+  React Realm Context
+</p>
+
+---
 
 A more React'y experience of Realm:
 
@@ -32,11 +40,32 @@ best documentation available.
 
 *// TODO: Add a static page showing off the TypeScript types and the usage of the individual components*
 
+<details>
+<summary>Components</summary>
+
+The RealmProvider handles opening and closing a Realm and provides it as a context for other components in its subtree.
+
+```javascript
+import { RealmProvider } from 'react-realm-context';
+
+const schema = [
+  { name: 'Person', properties: { name: 'string' } }
+];
+
+export const App = () => (
+  <RealmProvider schema={schema}>
+    {/* The rest of your app goes here ... */}
+  </RealmProvider>
+)
+```
+
+</details>
+
 ## Using it
 
 ### Default local Realm via the default context with [render-prop](https://reactjs.org/docs/render-props.html)
 
-```
+```javascript
 import React, { Component } from 'react';
 import { RealmProvider } from 'react-realm-context';
 
@@ -61,7 +90,7 @@ See `/examples/simple-render-props` for a complete example.
 
 ### Default local Realm via the default context
 
-```
+```javascript
 import React, { Component } from 'react';
 import { RealmProvider } from 'react-realm-context';
 
@@ -74,7 +103,7 @@ export const App = () => (
 );
 ```
 
-```
+```javascript
 // SomeDeeplyNestedComponent.js
 
 import React, { Component } from 'react';
@@ -105,7 +134,7 @@ Initializing data if the Realm is empty and querying for data are common pattern
 - Use the `RealmInitializer` to create objects if the Realm is empty.
 - Use the `RealmQuery` to query for objects somewhere in a `RealmProvider` sub-tree.
 
-```
+```javascript
 import React, { Component } from 'react';
 import { RealmProvider } from 'react-realm-context';
 
@@ -123,7 +152,7 @@ export const App = () => (
 );
 ```
 
-```
+```javascript
 // SomeDeeplyNestedComponent.js
 
 import React, { Component } from 'react';

@@ -153,6 +153,12 @@ pipeline {
             sh 'npm run build'
           }
         }
+
+        stage('Docs') {
+          steps {
+            sh 'npm run docs'
+          }
+        }
       }
     }
 
@@ -245,15 +251,6 @@ pipeline {
         tag "v*"
       }
       steps {
-        // Publish archive to NPM
-        withCredentials([
-          file(
-            credentialsId: 'npm-registry-npmrc',
-            variable: 'NPM_CONFIG_USERCONFIG',
-          )
-        ]) {
-          sh 'npm publish react-realm-context-*.tgz'
-        }
         // Upload artifacts to GitHub and publish release
         withCredentials([
           string(credentialsId: 'github-release-token', variable: 'GITHUB_TOKEN')
@@ -266,6 +263,19 @@ pipeline {
           script {
             sh "node scripts/github-releases publish $TAG_NAME"
           }
+        }
+        // Update the gh-pages branch
+        sshagent(['realm-ci-ssh']) {
+          sh "npx gh-pages -d generated-docs"
+        }
+        // Publish archive to NPM
+        withCredentials([
+          file(
+            credentialsId: 'npm-registry-npmrc',
+            variable: 'NPM_CONFIG_USERCONFIG',
+          )
+        ]) {
+          sh 'npm publish react-realm-context-*.tgz'
         }
       }
     }

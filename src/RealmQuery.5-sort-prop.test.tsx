@@ -22,7 +22,10 @@ import * as renderer from 'react-test-renderer';
 
 import { IPerson, schema } from '../utils/persons-realm';
 
-import { RealmConsumer, RealmProvider, RealmQuery, RealmSorting } from '.';
+import { RealmProvider, RealmQuery, RealmSorting } from '.';
+
+// This test doesn't document public methods and properties
+// tslint:disable:completed-docs
 
 describe('RealmQuery (sort prop)', () => {
   let tree: renderer.ReactTestRenderer;

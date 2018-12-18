@@ -1,9 +1,10 @@
 {
   "name": "react-realm-context",
   "version": "0.1.0",
-  "description": "Components that simplifies using Realm with React.js",
+  "description": "Components that simplifies using Realm with React",
   "scripts": {
     "build": "tsc -p config/tsconfig.build.json",
+    "docs": "typedoc --tsconfig config/tsconfig.build.json",
     "fix-headers": "node ./scripts/fix-headers.js",
     "lint:ts": "tslint --project tsconfig.json",
     "prepack": "npm run build",
@@ -33,6 +34,7 @@
     "commander": "^2.19.0",
     "create-react-app": "^1.5.2",
     "fs-extra": "^6.0.1",
+    "gh-pages": "^2.0.1",
     "hoist-non-react-statics": "^2.5.0",
     "mocha": "^5.1.1",
     "mocha-junit-reporter": "^1.17.0",
@@ -47,6 +49,7 @@
     "tslint-eslint-rules": "^5.4.0",
     "tslint-plugin-prettier": "^2.0.1",
     "tslint-react": "^3.6.0",
+    "typedoc": "^0.13.0",
     "typescript": "^3.1.6"
   },
   "peerDependencies": {

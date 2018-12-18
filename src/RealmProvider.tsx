@@ -21,13 +21,21 @@ import * as Realm from 'realm';
 
 import { IRealmContext } from '.';
 
-export type RealmRenderer = (context: IRealmContext) => React.ReactChild;
+type RealmRenderer = (context: IRealmContext) => React.ReactChild;
 
+/**
+ * Props passed to a RealmProvider component.
+ */
 export interface IRealmProviderProps extends Realm.Configuration {
   children: React.ReactNode | RealmRenderer;
   updateOnChange?: boolean;
 }
 
+/**
+ * Generates a RealmProvider wrapping a context provider.
+ *
+ * Use {@link createRealmContext} or the default RealmProvider instead of calling this directly.
+ */
 export const generateRealmProvider = (
   WrappedProvider: React.Provider<IRealmContext>,
 ): React.ComponentType<IRealmProviderProps> => {
@@ -58,6 +66,9 @@ export const generateRealmProvider = (
       }
     }
 
+    /**
+     * Renders the component.
+     */
     public render() {
       const { children } = this.props;
       const context = this.getContext();

@@ -20,13 +20,21 @@ import * as React from 'react';
 
 import { IRealmContext } from '.';
 
-export type ConsumerChild = (context: IRealmContext) => React.ReactNode;
+type ConsumerChild = (context: IRealmContext) => React.ReactNode;
 
+/**
+ * Props passed to a RealmConsumer component.
+ */
 export interface IRealmConsumerProps {
   children: ConsumerChild;
   updateOnChange?: boolean;
 }
 
+/**
+ * Generates a RealmConsumer wrapping a context consumer.
+ *
+ * Use {@link createRealmContext} or the default RealmConsumer instead of calling this directly.
+ */
 export const generateRealmConsumer = (
   WrappedConsumer: React.Consumer<IRealmContext>,
 ): React.ComponentType<IRealmConsumerProps> => {
@@ -39,6 +47,9 @@ export const generateRealmConsumer = (
       this.forgetRealm();
     }
 
+    /**
+     * Renders the component.
+     */
     public render() {
       return <WrappedConsumer>{this.renderContext}</WrappedConsumer>;
     }

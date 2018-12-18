@@ -21,10 +21,18 @@ import * as Realm from 'realm';
 
 import { IRealmConsumerProps } from '.';
 
+/**
+ * A generic type helper which removes one or more properties from an interface.
+ */
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 
 // Props extends { [Property in TKey]: Realm}, TKey extends keyof Props
 
+/**
+ * Generates a withRealm function wrapping a context consumer.
+ *
+ * Use {@link createRealmContext} or the default withRealm instead of calling this directly.
+ */
 export function generateWithRealm(
   Consumer: React.ComponentType<IRealmConsumerProps>,
 ) {
@@ -47,7 +55,14 @@ export function generateWithRealm(
     key: string = 'realm',
     consumerProps: Partial<IRealmConsumerProps> = {},
   ) {
+    /**
+     * [Higher order component](https://reactjs.org/docs/higher-order-components.html) enhancing the wrapped component
+     * by injecting a Realm into its props.
+     */
     return class WithRealm extends React.Component<Props> {
+      /**
+       * Renders the component.
+       */
       public render() {
         return (
           <Consumer {...consumerProps}>

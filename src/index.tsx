@@ -19,8 +19,6 @@
 import * as React from 'react';
 import * as Realm from 'realm';
 
-export type RealmRenderer = (context: IRealmContext) => React.ReactNode;
-
 import { generateRealmConnection } from './RealmConnection';
 import { generateRealmConsumer, IRealmConsumerProps } from './RealmConsumer';
 import {
@@ -38,6 +36,9 @@ export {
   IRealmQueryProps,
 };
 
+/**
+ * The context passed from a RealmProvider to any of its RealmConsumer
+ */
 export interface IRealmContext {
   realm: Realm;
 }
@@ -65,11 +66,46 @@ export { createRealmContext, Sorting as RealmSorting };
 
 // Create and export default RealmProvider and RealmConsumer
 const {
+  /**
+   * The default RealmProvider.
+   *
+   * If you're opening multiple Realms create separate contexts using {@link createRealmContext}.
+   */
   RealmProvider,
+
+  /**
+   * The default RealmConsumer, which will get its Realm from the default RealmProvider.
+   *
+   * If you're opening multiple Realms create separate contexts using {@link createRealmContext}.
+   */
   RealmConsumer,
+
+  /**
+   * The default RealmQuery, which will get its Realm from the default RealmProvider.
+   *
+   * If you're opening multiple Realms create separate contexts using {@link createRealmContext}.
+   */
   RealmQuery,
+
+  /**
+   * The default RealmInitializer, which will get its Realm from the default RealmProvider.
+   *
+   * If you're opening multiple Realms create separate contexts using {@link createRealmContext}.
+   */
   RealmInitializer,
+
+  /**
+   * The default RealmConnection, which will get its Realm from the default RealmProvider.
+   *
+   * If you're opening multiple Realms create separate contexts using {@link createRealmContext}.
+   */
   RealmConnection,
+
+  /**
+   * The default withRealm HOC, which will get its Realm from the default RealmProvider.
+   *
+   * If you're opening multiple Realms create separate contexts using {@link createRealmContext}.
+   */
   withRealm,
 } = createRealmContext();
 

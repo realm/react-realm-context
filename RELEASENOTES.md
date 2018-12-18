@@ -7,4 +7,4 @@
 - None
 
 ## Internals
-- None
+- Added documentation using tsdocs published to GitHub pages on https://realm.github.io/react-realm-context. ([#10](https://github.com/realm/react-realm-context/pull/10))
