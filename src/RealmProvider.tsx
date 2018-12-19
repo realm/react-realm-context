@@ -25,6 +25,9 @@ type RealmRenderer = (context: IRealmContext) => React.ReactChild;
 
 /**
  * Props passed to a RealmProvider component.
+ *
+ * Extends the [Realm.Configuration](https://realm.io/docs/javascript/latest/api/Realm.html#~Configuration) matching the
+ * Realm JS version installed as peer dependency.
  */
 export interface IRealmProviderProps extends Realm.Configuration {
   children: React.ReactNode | RealmRenderer;
