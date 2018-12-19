@@ -33,60 +33,108 @@ package to function correctly.
 
 ## Documentation
 
-For now, this README.md, the `/examples` in this repository and the TypeScript types published with the package are the
-best documentation available.
+Documentation generated from the TypeScript (tsdocs) comments of the latest published version is published on
+https://realm.github.io/react-realm-context. In addition to this and the README.md, the
+[/examples](https://github.com/realm/react-realm-context/tree/master/examples) directory and the TypeScript types
+published with the package are the best documentation available.
 
-*// TODO: Add a static page showing off the TypeScript types and the usage of the individual components*
+## Using React Realm Context
+
+### Importing the components
+
+If you're only planing on opening a single Realm throughout your app, you should use the "default components" exported
+by this package.
+
+```javascript
+import {
+  RealmProvider,
+  RealmConsumer,
+  RealmConnection,
+  RealmInitializer,
+  RealmQuery,
+  withRealm
+} from 'react-realm-context';
+```
 
 <details>
-<summary>Components</summary>
+<summary>Using React Realm Context with multiple Realms (click to expand)</summary>
 
-The RealmProvider handles opening and closing a Realm and provides it as a context for other components in its subtree.
+If you're planning on opening multiple Realms within the same app, you should create a context (calling
+`createRealmContext`) for every Realm that you plan on accessing.
+
+It's a good pattern to wrap the creation of the context in its own module and export the newly created components from
+that, renaming the components.
 
 ```javascript
-import { RealmProvider } from 'react-realm-context';
+// MyRealm.js
 
-const schema = [
-  { name: 'Person', properties: { name: 'string' } }
-];
-
-export const App = () => (
-  <RealmProvider schema={schema}>
-    {/* The rest of your app goes here ... */}
-  </RealmProvider>
-)
+import { createRealmContext } from 'react-realm-context';
+// Create the Realm context components
+const {
+  RealmProvider,
+  RealmConsumer,
+  RealmConnection,
+  RealmInitializer,
+  RealmQuery,
+  withRealm
+} = createRealmContext();
+// Export the components renamed
+export {
+  RealmProvider as MyRealmProvider,
+  RealmConsumer as MyRealmConsumer,
+  RealmConnection as MyRealmConnection,
+  RealmInitializer as MyRealmInitializer,
+  RealmQuery as MyRealmQuery,
+  withRealm as withMyRealm,
+}
 ```
 
-</details>
-
-## Using it
-
-### Default local Realm via the default context with [render-prop](https://reactjs.org/docs/render-props.html)
+It's also a good pattern to define and export the schema used in the particular Realm from here, or even better, create
+a functional component wrapping the newly created `RealmProvider` with the logic needed to open the Realm:
 
 ```javascript
-import React, { Component } from 'react';
-import { RealmProvider } from 'react-realm-context';
+// MyRealm.js
 
-export const App = () => (
-  <RealmProvider schema={[{ name: 'Person', properties: { name: 'string' } }]}>
-    {({ realm }) => {
-      if (realm.empty) {
-        realm.write(() => {
-          realm.create('Person', { name: 'John Doe' });
-        });
-      }
-      return realm.objects('Person').map(person => person.name).join(', ');
-    }}
+// Instead of "RealmProvider as MyRealmProvider".
+// Create a MyRealmProvider component wrapping the newly created context provider.
+const schema = [ /* Your Realm schema goes here ... */ ];
+export const MyRealmProvider = ({ children }) => (
+  <RealmProvider schema={schema}>
+    {children}
   </RealmProvider>
 );
-
 ```
 
-This will open the default local Realm using the default `RealmProvider` exported by the package.
+If you're using TypeScript, the `MyRealm.ts` would be a great place to export the types used in the schema too.
+</details>
 
-See `/examples/simple-render-props` for a complete example.
+### Using a RealmProvider and RealmConsumer
 
-### Default local Realm via the default context
+React Realm Context is built around two primitives known from the
+[React context API](https://reactjs.org/docs/context.html), the provider and the consumer.
+
+#### RealmProvider
+
+This component opens and closes the Realm and it provides a Realm context to any consumer in its component sub-tree
+(its children or their children, etc). The RealmProvider passes any props to the Realm JS constructor as configuration
+when opening the Realm. See https://realm.io/docs/javascript/latest/api/Realm.html#~Configuration of the Realm JS
+version used as peer dependency for a list of available props.
+
+#### RealmConsumer
+
+This component consumes the Realm provided by the provider and renders or modifies data from the Realm. It's using the
+[render prop pattern](https://reactjs.org/docs/render-props.html#using-props-other-than-render) to expose the Realm.
+
+It takes an optional prop to `updateOnChange` (default is `false`) which will register listeners and re-render the
+component on any change to the Realm.
+
+#### Example
+
+See [/examples/simple-context](https://github.com/realm/react-realm-context/tree/master/examples/simple-context) for the
+complete example app.
+
+<details>
+<summary>Example: Using the default RealmProvider and RealmConsumer in a simple app (click to expand)</summary>
 
 ```javascript
 import React, { Component } from 'react';
@@ -123,15 +171,55 @@ export const SomeDeeplyNestedComponent = () => (
 
 This will open the default local Realm using the default `RealmProvider` exported by the package and pass the open Realm
 to any (potentially deeply nested) `RealmConsumer`s in its component sub-tree.
+</details>
 
-See `/examples/simple-context` for a complete example.
+### Using a RealmQuery and RealmInitializer
 
-### Default local Realm via the default context, RealmInitializer and RealmQuery
+Some tasks are frequently performed with Realms (like populating the Realm with data or querying it for data), to
+simplify these common tasks React Realm Context implements a few helper components.
 
-Initializing data if the Realm is empty and querying for data are common patterns that the package has components for:
-- Use the `RealmInitializer` to create objects if the Realm is empty.
-- Use the `RealmQuery` to query for objects somewhere in a `RealmProvider` sub-tree.
+#### RealmQuery
 
+The `RealmQuery` component wraps the `RealmConsumer` to provide a simple interface for reading objects from the Realm.
+
+It takes props for the `type` of objects to query for as well as optional props for `filter` and `sort` which should be
+applied to the results. This component uses the
+[render prop pattern](https://reactjs.org/docs/render-props.html#using-props-other-than-render) to expose the results as
+an object with a `results` property passed to the callback function passed as `children` to the component.
+
+
+```javascript
+<RealmQuery type="Person" filter="age > 10" sort="name">
+  {({ results }) => results.map(person => person.name).join(', ')}
+</RealmQuery>
+```
+
+#### RealmInitializer
+
+The `RealmInitializer` component wraps the `RealmConsumer` to provide a simple interface for creating objects if the
+Realm is opened for the first time (and is therefore empty).
+
+This component uses the
+[render prop pattern](https://reactjs.org/docs/render-props.html#using-props-other-than-render) and calls the function
+passed as `children` only if the Realm is empty. It calls the callback while in a write transaction.
+
+```javascript
+<RealmInitializer>
+  {({ realm }) => {
+    realm.create('Person', { name: 'Alice', age: 16 });
+    realm.create('Person', { name: 'Bobby Boy', age: 37 });
+    realm.create('Person', { name: 'Charlie', age: 72 });
+  }}
+</RealmInitializer>
+```
+
+#### Example
+
+See [/examples/initializer-and-query](https://github.com/realm/react-realm-context/tree/master/examples/initializer-and-query)
+for the complete example app.
+
+<details>
+<summary>Example: Using the default RealmProvider, RealmInitializer and RealmQuery in a simple app (click to expand)</summary>
 ```javascript
 import React, { Component } from 'react';
 import { RealmProvider } from 'react-realm-context';
@@ -164,9 +252,46 @@ export const SomeDeeplyNestedComponent = () => (
 ```
 
 This will open the default local Realm using the default `RealmProvider`, use the `RealmInitializer` to create a person
-named "John Doe" if no data exists when opening the Realm and use the `RealmQuery` to render the persons names.
+named "John Doe" if no data exists and use the `RealmQuery` to render the persons names.
+</details>
 
-See `/examples/initializer-and-query` for a complete example.
+### Using a RealmConnection
+
+If your app is using a Realm synchronized with the Realm Object Server, it might be nice to display the current state
+of connectivity. For this you can use the `RealmConnection` component, which wraps the `RealmConsumer` and attach
+listeners on the
+[sync sessions connection state](https://realm.io/docs/javascript/latest/api/Realm.Sync.Session.html#connectionState)
+It uses the [render prop pattern](https://reactjs.org/docs/render-props.html#using-props-other-than-render) and calls
+the function passed as `children` initially and every time the connection state changes.
+
+```javascript
+<RealmConnection>
+  {connectionState => `Connection state: ${connectionState}`}
+</RealmConnection>
+```
+
+### Using a withRealm
+
+If you just want to implement a component that uses the Realm it might be verbose to implement a component that renders
+a `RealmConsumer` and passes the Realm instance to a different component which uses it.
+
+In this scenario you might want to use the `withRealm`
+[higher-order component](https://reactjs.org/docs/higher-order-components.html) to enhance your own component.
+
+```javascript
+// Defining a component that needs a `realm` Realm instance
+const MyComponent = ({ greeting, realm }) => `${greeting}, realm is ${realm.isClosed ? 'closed' : 'open'}`;
+
+// Enhance the component, which injects the `realm` prop when rendered
+const MyEnhancedComponent = withRealm(MyComponent);
+
+// Renders "Hi there, realm is open"
+const App = () => (
+  <RealmProvider>
+    <MyEnhancedComponent greeting="Hi there" />
+  </RealmProvider>
+);
+```
 
 ## Code of Conduct
 
