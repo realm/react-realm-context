@@ -45,19 +45,14 @@ export interface IRealmContext {
 
 const createRealmContext = () => {
   const context = React.createContext<IRealmContext>(null);
-  const Provider = generateRealmProvider(context.Provider);
   const Consumer = generateRealmConsumer(context.Consumer);
-  const Query = generateRealmQuery(Consumer);
-  const Initializer = generateRealmInitializer(Consumer);
-  const Connection = generateRealmConnection(Consumer);
-  const withRealmHOC = generateWithRealm(Consumer);
   return {
-    RealmProvider: Provider,
+    RealmProvider: generateRealmProvider(context.Provider),
     RealmConsumer: Consumer,
-    RealmQuery: Query,
-    RealmInitializer: Initializer,
-    RealmConnection: Connection,
-    withRealm: withRealmHOC,
+    RealmQuery: generateRealmQuery(Consumer),
+    RealmInitializer: generateRealmInitializer(Consumer),
+    RealmConnection: generateRealmConnection(Consumer),
+    withRealm: generateWithRealm(Consumer),
   };
 };
 

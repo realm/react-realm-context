@@ -3,6 +3,9 @@
   "compilerOptions": {
     "outDir": "../build"
   },
+  "files": [
+    "../src/index.tsx"
+  ],
   "include": [
     "../src/**/*.tsx"
   ],
@@ -11,14 +14,12 @@
   ],
   "typedocOptions": {
     "mode": "file",
+    "target": "ES6",
     "out": "generated-docs",
-    "excludePrivate": true,
-    "preserveConstEnums": true,
-    "stripInternal": true,
-    "hideGenerator": true,
-    "readme": "none",
-    "includeDeclarations": false,
     "name": "React Realm Context",
-    "inlineSourceMap": true
+    "readme": "none",
+    "hideGenerator": true,
+    "preserveConstEnums": true,
+    "stripInternal": true
   }
 }
