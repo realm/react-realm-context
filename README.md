@@ -130,6 +130,14 @@ component on any change to the Realm.
 
 #### Example
 
+```javascript
+<RealmProvider schema={[{ name: 'Person', properties: { name: 'string' } }]}>
+  <RealmConsumer updateOnChange={true}>
+    {({ realm }) => realm.objects('Person').map(person => person.name).join(', ')}
+  </RealmConsumer>
+</RealmProvider>
+```
+
 See [/examples/simple-context](https://github.com/realm/react-realm-context/tree/master/examples/simple-context) for the
 complete example app.
 
