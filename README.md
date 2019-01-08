@@ -308,16 +308,10 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 ## License
 
-Realm React Context is published under the Apache 2.0 license.
-
-**This product is not being made available to any person located in Cuba, Iran,
-North Korea, Sudan, Syria or the Crimea region, or to any other person that is
-not eligible to receive the product under U.S. law.**
+Realm React Context is published under [the Apache 2.0 license](LICENSE).
 
 ## Feedback
 
-**_If you use Realm and are happy with it, all we ask is that you please consider sending out a tweet mentioning [@realm](https://twitter.com/realm) to share your thoughts_**
-
-**_And if you don't like it, please let us know what you would like improved, so we can fix it!_**
+If you use Realm and are happy with it, all we ask is that you please consider sending out a tweet mentioning [@realm](https://twitter.com/realm) to share your thoughts.
 
 ![analytics](https://ga-beacon.appspot.com/UA-50247013-2/react-realm-context/README?pixel)
