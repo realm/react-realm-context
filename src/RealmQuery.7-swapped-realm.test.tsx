@@ -24,6 +24,9 @@ import { IPerson, schema } from '../utils/persons-realm';
 
 import { IRealmQueryProps, RealmProvider, RealmQuery } from '.';
 
+// This test doesn't document public methods and properties
+// tslint:disable:completed-docs
+
 describe('RealmQuery (swapped Realm)', () => {
   let tree: renderer.ReactTestRenderer;
 
