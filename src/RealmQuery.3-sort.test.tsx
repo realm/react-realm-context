@@ -30,7 +30,7 @@ describe('RealmQuery (sort)', () => {
   afterEach(() => {
     if (tree) {
       tree.unmount();
-      tree = undefined;
+      tree = null;
     }
     // Delete the default file after the tests
     Realm.deleteFile({});

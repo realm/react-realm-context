@@ -28,6 +28,10 @@ describe('RealmQuery (basic)', () => {
   let tree: renderer.ReactTestRenderer;
 
   afterEach(() => {
+    if (tree) {
+      tree.unmount();
+      tree = null;
+    }
     // Delete the default file after the tests
     Realm.deleteFile({});
   });

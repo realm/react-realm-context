@@ -6,7 +6,13 @@ import * as Realm from 'realm';
  */
 export interface IPerson {
   name: string;
-  age: number;
+  age?: number;
+  dogs: Realm.List<IDog>;
+}
+
+export interface IDog {
+  name: string;
+  age?: number;
 }
 
 /**
@@ -16,6 +22,14 @@ export interface IPerson {
 export const schema: Realm.ObjectSchema[] = [
   {
     name: 'Person',
+    properties: {
+      name: 'string',
+      age: 'int?',
+      dogs: 'Dog[]',
+    },
+  },
+  {
+    name: 'Dog',
     properties: {
       name: 'string',
       age: 'int?',

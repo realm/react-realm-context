@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+import equal from 'fast-deep-equal';
+import memoizeOne from 'memoize-one';
 import React from 'react';
 import Realm from 'realm';
 
@@ -40,29 +42,26 @@ export const generateRealmProvider = (
   WrappedProvider: React.Provider<IRealmContext>,
 ): React.ComponentType<IRealmProviderProps> => {
   class RealmProvider extends React.Component<IRealmProviderProps> {
+    private changeListenersAdded: boolean = false;
     private realm: Realm;
+    private memoizedRealm = memoizeOne((config: Realm.Configuration) => {
+      // Another Realm was already memoized, let's forget about it
+      if (this.realm) {
+        this.forgetRealm();
+      }
+      // Create a new Realm
+      const realm = new Realm(config);
+      // Store it so we can clean up later
+      this.realm = realm;
+      // Return the Realm
+      return realm;
+    }, equal);
 
     // TODO: Add propTypes for non-TypeScript users
 
-    public constructor(props: IRealmProviderProps) {
-      super(props);
-      // Open the Realm
-      const { children, ...config } = this.props;
-      this.realm = new Realm(config);
-      if (props.updateOnChange) {
-        this.realm.addListener('change', this.onRealmChange);
-        this.realm.addListener('schema', this.onRealmChange);
-      }
-    }
-
     public componentWillUnmount() {
       if (this.realm) {
-        if (!this.realm.isClosed) {
-          this.realm.removeListener('change', this.onRealmChange);
-          this.realm.removeListener('schema', this.onRealmChange);
-        }
-        this.realm.close();
-        delete this.realm;
+        this.forgetRealm();
       }
     }
 
@@ -70,19 +69,43 @@ export const generateRealmProvider = (
      * Renders the component.
      */
     public render() {
-      const { children } = this.props;
-      const context = this.getContext();
+      const { children, updateOnChange, ...config } = this.props;
+      const realm = this.memoizedRealm(config);
+      // Register the change listeners if asked to and they were not already there
+      if (updateOnChange && !this.changeListenersAdded) {
+        this.addChangeListeners(realm);
+      }
+      // Collect the context
+      const context: IRealmContext = { realm };
       return (
         <WrappedProvider value={context}>
           {typeof children === 'function'
-            ? (children as RealmRenderer)(context) /* Assume a RealmRenderer */
+            ? (children as RealmRenderer)(context) // Assume a RealmRenderer
             : children}
         </WrappedProvider>
       );
     }
 
-    private getContext(): IRealmContext {
-      return { realm: this.realm };
+    private forgetRealm() {
+      if (!this.realm.isClosed) {
+        // Ensure we don't register change listeners anymore
+        this.removeChangeListeners(this.realm);
+        this.realm.close();
+      }
+      this.changeListenersAdded = false;
+      delete this.realm;
+    }
+
+    private addChangeListeners(realm: Realm) {
+      realm.addListener('change', this.onRealmChange);
+      realm.addListener('schema', this.onRealmChange);
+      this.changeListenersAdded = true;
+    }
+
+    private removeChangeListeners(realm: Realm) {
+      realm.removeListener('change', this.onRealmChange);
+      realm.removeListener('schema', this.onRealmChange);
+      this.changeListenersAdded = false;
     }
 
     private onRealmChange = () => {
