@@ -16,46 +16,43 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import * as assert from 'assert';
-import * as React from 'react';
-import * as renderer from 'react-test-renderer';
+import assert from 'assert';
+import React from 'react';
+import renderer from 'react-test-renderer';
 
-import { IPerson, schema } from '../utils/persons-realm';
+import { IDog, IPerson, schema } from '../utils/persons-realm';
 
 import { RealmProvider, RealmQuery } from '.';
 
 // This test doesn't document public methods and properties
 // tslint:disable:completed-docs
 
-describe('RealmQuery (filter prop)', () => {
+describe('RealmQuery (type prop)', () => {
   let tree: renderer.ReactTestRenderer;
 
   afterEach(() => {
     if (tree) {
       tree.unmount();
-      tree = undefined;
+      tree = null;
     }
     // Delete the default file after the tests
     Realm.deleteFile({});
   });
 
-  it('will update when filter prop change', done => {
+  it('will update when prop change', done => {
     let step = 0;
 
-    interface IPersonListProps {
-      threashold: number;
+    interface IListState {
+      type: 'Person' | 'Dog';
     }
 
-    class PersonList extends React.Component<{}, IPersonListProps> {
-      public state: IPersonListProps = { threashold: 30 };
+    class List extends React.Component<{}, IListState> {
+      public state: IListState = { type: 'Person' };
 
       public render() {
         return (
           <RealmProvider schema={schema}>
-            <RealmQuery
-              type="Person"
-              filter={['age > $0', this.state.threashold]}
-            >
+            <RealmQuery type={this.state.type}>
               {({ realm, results }) => {
                 if (step === 0) {
                   step++;
@@ -63,32 +60,32 @@ describe('RealmQuery (filter prop)', () => {
                   assert.equal(results.length, 0);
                   // Create a person
                   realm.write(() => {
-                    // John Doe
-                    realm.create<IPerson>('Person', {
-                      name: 'John Doe',
-                      age: 42,
-                    });
-                    // Alice
-                    realm.create<IPerson>('Person', {
+                    // The person Alice
+                    const alice = realm.create<IPerson>('Person', {
                       name: 'Alice',
-                      age: 40,
                     });
+                    // The person Bob
+                    realm.create<IPerson>('Person', { name: 'Bob' });
+                    // The dog Charlie
+                    const charlie = realm.create<IDog>('Dog', {
+                      name: 'Charlie',
+                    });
+                    // Which belongs to Alice
+                    alice.dogs.push(charlie);
                   });
                 } else if (step === 1) {
                   step++;
                   assert.equal(results.length, 2);
-                  // Change the filter to cut out Alice
-                  process.nextTick(() => {
-                    this.setState({ threashold: 41 });
-                  });
+                  // We expect Alice first and then John
+                  assert.equal(results[0].name, 'Alice');
+                  assert.equal(results[1].name, 'Bob');
+                  // Change the query to return Dogs
+                  this.setState({ type: 'Dog' });
                 } else if (step === 2) {
                   step++;
-                  // We expect that Alice is no longer in the results
                   assert.equal(results.length, 1);
-                  // But John should still be there
-                  const person = results[0];
-                  assert.equal(person.name, 'John Doe');
-                  assert.equal(person.age, 42);
+                  // We expect Alice's dog charlie
+                  assert.equal(results[0].name, 'Charlie');
                   // We're done!
                   done();
                 } else {
@@ -106,7 +103,7 @@ describe('RealmQuery (filter prop)', () => {
       }
     }
 
-    tree = renderer.create(<PersonList />);
+    tree = renderer.create(<List />);
     // Asserting the tree matches the string which was returned
     assert.equal(tree.toJSON(), null);
   });

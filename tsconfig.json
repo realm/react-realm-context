@@ -4,10 +4,17 @@
     "module": "commonjs",
     "jsx": "react",
     "noImplicitAny": true,
-    "declaration": true
+    "declaration": true,
+    "esModuleInterop": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/@types"
+    ]
   },
   "include": [
     "src/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.d.ts",
     "utils/*.ts",
     "integration-tests/*.ts"
   ]
