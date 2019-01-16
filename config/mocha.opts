@@ -1,5 +1,5 @@
 -r ts-node/register
--r segfault-handler.js
+-r src/segfault-handler.js
 --forbid-only
 --watch-extensions ts,tsx
 --exit
