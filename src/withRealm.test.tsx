@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import * as assert from 'assert';
-import * as React from 'react';
-import * as renderer from 'react-test-renderer';
+import assert from 'assert';
+import React from 'react';
+import renderer from 'react-test-renderer';
 
 import { IPerson, schema } from '../utils/persons-realm';
 
