@@ -65,7 +65,6 @@ export const environment = (versions: IEnvironmentVersions) => {
     ensureLinkIntoEnvironment(environmentPath, 'tsconfig.json');
     ensureLinkIntoEnvironment(environmentPath, 'config');
     ensureLinkIntoEnvironment(environmentPath, 'src');
-    ensureLinkIntoEnvironment(environmentPath, 'utils');
     // Copy the package-lock to ensure versions are locked down but it doesn't get mutated
     fs.copyFileSync(
       path.resolve(PROJECT_PATH, 'package-lock.json'),
@@ -74,7 +73,11 @@ export const environment = (versions: IEnvironmentVersions) => {
 
     if (!fs.existsSync(path.resolve(environmentPath, 'node_modules'))) {
       // Install the specific versions of Realm and React
-      exec(`npm install realm@${versions.realm} react@${versions.react}`);
+      const dependencies = [
+        `realm@${versions.realm}`,
+        `react@${versions.react}`,
+      ].join(' ');
+      exec(`npm install ${dependencies} --no-save --fallback-to-build=false`);
     }
   };
 
