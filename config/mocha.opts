@@ -1,5 +1,7 @@
--r ts-node/register
--r src/segfault-handler.js
+--require ts-node/register
+--require src/test-utils/segfault-handler.ts
+--require src/test-utils/realm-js-logging.ts
 --forbid-only
 --watch-extensions ts,tsx
 --exit
+

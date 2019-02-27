@@ -20,7 +20,7 @@ import assert from 'assert';
 import React from 'react';
 import renderer from 'react-test-renderer';
 
-import { IDog, IPerson, schema } from '../utils/persons-realm';
+import { IDog, IPerson, schema } from './test-utils/persons-realm';
 
 import { RealmProvider, RealmQuery } from '.';
 

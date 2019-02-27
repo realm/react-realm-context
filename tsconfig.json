@@ -6,16 +6,12 @@
     "noImplicitAny": true,
     "declaration": true,
     "esModuleInterop": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/@types"
-    ]
+    "typeRoots": ["./src/@types", "./node_modules/@types"]
   },
   "include": [
     "src/**/*.tsx",
     "src/**/*.ts",
     "src/**/*.d.ts",
-    "utils/*.ts",
     "integration-tests/*.ts"
   ]
 }
