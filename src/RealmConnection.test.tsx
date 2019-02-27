@@ -16,13 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import assert from 'assert';
+import assert, { rejects } from 'assert';
 import React from 'react';
 import renderer from 'react-test-renderer';
 
-import { schema } from '../utils/persons-realm';
+import { schema } from './test-utils/persons-realm';
+import { withROS } from './test-utils/with-ros';
 
-import { RealmConnection, RealmProvider } from '.';
+import { RealmConnection, RealmConsumer, RealmProvider } from '.';
 
 describe('RealmConnection', () => {
   let tree: renderer.ReactTestRenderer;
@@ -54,37 +55,58 @@ describe('RealmConnection', () => {
   });
 
   // Skipping this until we start a ROS server while running the tests
-  it.skip('will be connecting for synced Realms', async () => {
+  withROS.it('will be connecting for synced Realms', async function() {
     const states: string[] = [];
-    const user = await Realm.Sync.User.login(
-      'http://localhost:9080',
-      Realm.Sync.Credentials.usernamePassword('realm-admin', ''),
-      // Realm.Sync.Credentials.adminToken('faking-it'),
-    );
+    const user = await this.ros.createTestUser();
     const config = user.createConfiguration({
       schema,
-      sync: { fullSynchronization: true },
+      sync: { fullSynchronization: true, url: '~/connection-test' },
     });
-    // Render with a sync configuration
-    tree = renderer.create(
-      <RealmProvider {...config}>
-        <RealmConnection>
-          {connectionState => {
-            states.push(connectionState);
-            return connectionState;
-          }}
-        </RealmConnection>
-      </RealmProvider>,
-    );
 
-    // Wait for the client to connect
-    await new Promise(resolve => setTimeout(resolve, 100));
-    // Unmounting should close the Realm
+    let realm: Realm;
+
+    // Wait for the connection state to be connected
+    await new Promise(resolve => {
+      // Render with a sync configuration
+      tree = renderer.create(
+        <RealmProvider {...config}>
+          <RealmConsumer>
+            {context => {
+              realm = context.realm;
+              return null;
+            }}
+          </RealmConsumer>
+          <RealmConnection>
+            {connectionState => {
+              states.push(connectionState);
+              if (connectionState === 'connected') {
+                resolve();
+              }
+              return connectionState;
+            }}
+          </RealmConnection>
+        </RealmProvider>,
+      );
+    });
+    // Assert something about the states that changed so far
+    assert.deepEqual(states, ['disconnected', 'connecting', 'connected']);
+    // Create a promise that resolves when the state changes from connected to disconnected
+    const disconnectedPromise = new Promise((resolve, reject) => {
+      realm.syncSession.addConnectionNotification((newState, oldState) => {
+        if (newState === 'disconnected' && oldState === 'connected') {
+          resolve();
+        } else {
+          reject(`Unexpected state change, got ${newState} => ${oldState}`);
+        }
+      });
+    });
+    // Unmounting should close the Realm and disconnect
     tree.unmount();
     // Asserting the tree matches the string which was returned
     assert.equal(tree.toJSON(), null);
-    assert.deepEqual(states, ['disconnected', 'connecting', 'connected']);
     // Forget about the tree
     tree = null;
+    // Await a disconnection
+    await disconnectedPromise;
   });
 });
