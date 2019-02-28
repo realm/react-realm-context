@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>IRealmConnectionState | React Realm Context</title>
+	<title>IRealmProgressProps | React Realm Context</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,21 +56,28 @@
 					<a href="../index.html">Globals</a>
 				</li>
 				<li>
-					<a href="irealmconnectionstate.html">IRealmConnectionState</a>
+					<a href="irealmprogressprops.html">IRealmProgressProps</a>
 				</li>
 			</ul>
-			<h1>Interface IRealmConnectionState</h1>
+			<h1>Interface IRealmProgressProps</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Props passed to a RealmProgress component.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">IRealmConnectionState</span>
+						<span class="target">IRealmProgressProps</span>
 					</li>
 				</ul>
 			</section>
@@ -78,26 +85,81 @@
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section tsd-is-not-exported">
+						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="irealmconnectionstate.html#connectionstate" class="tsd-kind-icon">connection<wbr>State</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="irealmprogressprops.html#children" class="tsd-kind-icon">children</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="irealmprogressprops.html#direction" class="tsd-kind-icon">direction</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="irealmprogressprops.html#mode" class="tsd-kind-icon">mode</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
-					<a name="connectionstate" class="tsd-anchor"></a>
-					<h3>connection<wbr>State</h3>
-					<div class="tsd-signature tsd-kind-icon">connection<wbr>State<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ConnectionState</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="children" class="tsd-anchor"></a>
+					<h3>children</h3>
+					<div class="tsd-signature tsd-kind-icon">children<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/realm/react-realm-context/blob/bc025ed/src/RealmConnection.tsx#L25">RealmConnection.tsx:25</a></li>
+							<li>Defined in <a href="https://github.com/realm/react-realm-context/blob/bc025ed/src/RealmProgress.tsx#L71">RealmProgress.tsx:71</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><a href="irealmprogressvalue.html" class="tsd-signature-type">IRealmProgressValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">React.ReactChild</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>value: <a href="irealmprogressvalue.html" class="tsd-signature-type">IRealmProgressValue</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">React.ReactChild</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="direction" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> direction</h3>
+					<div class="tsd-signature tsd-kind-icon">direction<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Realm.Sync.ProgressDirection</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"both"</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/realm/react-realm-context/blob/bc025ed/src/RealmProgress.tsx#L65">RealmProgress.tsx:65</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>In what direction should the callback passed as <code>children</code> be called?
+							Possible values are &quot;download&quot;, &quot;upload&quot; or &quot;both&quot; (default).</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="mode" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> mode</h3>
+					<div class="tsd-signature tsd-kind-icon">mode<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Realm.Sync.ProgressMode</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/realm/react-realm-context/blob/bc025ed/src/RealmProgress.tsx#L70">RealmProgress.tsx:70</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Should the callback passed as <code>children</code> be called indefinitly or just for outstanding work which has not been
+							uploaded / downloaded since the point of mounting the component?</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -117,18 +179,9 @@
 					<li class=" tsd-kind-interface">
 						<a href="irealmconnectionprops.html" class="tsd-kind-icon">IRealm<wbr>Connection<wbr>Props</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-interface tsd-is-not-exported">
+					<li class=" tsd-kind-interface tsd-is-not-exported">
 						<a href="irealmconnectionstate.html" class="tsd-kind-icon">IRealm<wbr>Connection<wbr>State</a>
-						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
-								<a href="irealmconnectionstate.html#connectionstate" class="tsd-kind-icon">connection<wbr>State</a>
-							</li>
-						</ul>
 					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-interface">
 						<a href="irealmconsumerprops.html" class="tsd-kind-icon">IRealm<wbr>Consumer<wbr>Props</a>
 					</li>
@@ -138,9 +191,24 @@
 					<li class=" tsd-kind-interface">
 						<a href="irealminitializerprops.html" class="tsd-kind-icon">IRealm<wbr>Initializer<wbr>Props</a>
 					</li>
-					<li class=" tsd-kind-interface">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface">
 						<a href="irealmprogressprops.html" class="tsd-kind-icon">IRealm<wbr>Progress<wbr>Props</a>
+						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="irealmprogressprops.html#children" class="tsd-kind-icon">children</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="irealmprogressprops.html#direction" class="tsd-kind-icon">direction</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="irealmprogressprops.html#mode" class="tsd-kind-icon">mode</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-is-not-exported">
 						<a href="irealmprogressstate.html" class="tsd-kind-icon">IRealm<wbr>Progress<wbr>State</a>
 					</li>
