@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import memoizeOne from 'memoize-one';
-import React from 'react';
-import Realm from 'realm';
+import * as memoizeOne from 'memoize-one';
+import * as React from 'react';
+import * as Realm from 'realm';
 
 import { IRealmContext } from '.';
 

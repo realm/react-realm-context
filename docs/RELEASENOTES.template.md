@@ -1,10 +1,13 @@
 [Changes since {PREVIOUS_VERSION}](https://github.com/realm/react-realm-context/compare/{PREVIOUS_VERSION}...{CURRENT_VERSION})
 
 ## Enhancements
-- None
+
+* None
 
 ## Fixed
-- None
+
+* None
 
 ## Internals
-- None
+
+* None

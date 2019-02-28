@@ -1,5 +1,5 @@
 import { ITestCallbackContext } from 'mocha';
-import Realm from 'realm';
+import * as Realm from 'realm';
 import { v4 as uuid } from 'uuid';
 
 const { REALM_OBJECT_SERVER_URL } = process.env;

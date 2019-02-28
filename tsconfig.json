@@ -5,7 +5,6 @@
     "jsx": "react",
     "noImplicitAny": true,
     "declaration": true,
-    "esModuleInterop": true,
     "typeRoots": ["./src/@types", "./node_modules/@types"]
   },
   "include": [

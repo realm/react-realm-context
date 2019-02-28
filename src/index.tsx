@@ -16,8 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import React from 'react';
-import Realm from 'realm';
+import * as React from 'react';
+import * as Realm from 'realm';
 
 import { generateRealmConnection } from './RealmConnection';
 import { generateRealmConsumer, IRealmConsumerProps } from './RealmConsumer';
