@@ -44,13 +44,14 @@ describe('realm-realm-context', () => {
       // Create a context
       const result = createRealmContext();
       // Assert something about it
-      assert.equal(Object.keys(result).length, 6);
+      assert.equal(Object.keys(result).length, 7);
       const {
         RealmProvider,
         RealmConsumer,
         RealmInitializer,
         RealmQuery,
         RealmConnection,
+        RealmProgress,
         withRealm,
       } = result;
       assert(RealmProvider);
@@ -58,6 +59,7 @@ describe('realm-realm-context', () => {
       assert(RealmInitializer);
       assert(RealmQuery);
       assert(RealmConnection);
+      assert(RealmProgress);
       assert(withRealm);
     });
 

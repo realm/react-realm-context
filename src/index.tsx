@@ -25,6 +25,11 @@ import {
   generateRealmInitializer,
   IRealmInitializerProps,
 } from './RealmInitializer';
+import {
+  generateRealmProgress,
+  IRealmProgressProps,
+  IRealmProgressValue,
+} from './RealmProgress';
 import { generateRealmProvider, IRealmProviderProps } from './RealmProvider';
 import { generateRealmQuery, IRealmQueryProps, Sorting } from './RealmQuery';
 import { generateWithRealm } from './withRealm';
@@ -33,6 +38,8 @@ export {
   IRealmConsumerProps,
   IRealmInitializerProps,
   IRealmProviderProps,
+  IRealmProgressProps,
+  IRealmProgressValue,
   IRealmQueryProps,
 };
 
@@ -52,6 +59,7 @@ const createRealmContext = () => {
     RealmQuery: generateRealmQuery(Consumer),
     RealmInitializer: generateRealmInitializer(Consumer),
     RealmConnection: generateRealmConnection(Consumer),
+    RealmProgress: generateRealmProgress(Consumer),
     withRealm: generateWithRealm(Consumer),
   };
 };
@@ -97,6 +105,13 @@ const {
   RealmConnection,
 
   /**
+   * The default RealmProgress, which will get its Realm from the default RealmProvider.
+   *
+   * If you're opening multiple Realms create separate contexts using {@link createRealmContext}.
+   */
+  RealmProgress,
+
+  /**
    * The default withRealm HOC, which will get its Realm from the default RealmProvider.
    *
    * If you're opening multiple Realms create separate contexts using {@link createRealmContext}.
@@ -110,5 +125,6 @@ export {
   RealmQuery,
   RealmInitializer,
   RealmConnection,
+  RealmProgress,
   withRealm,
 };
