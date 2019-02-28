@@ -1,3 +1,20 @@
+# Release 0.3.0 (2019-02-28)
+
+[Changes since v0.2.0](https://github.com/realm/react-realm-context/compare/v0.2.0...v0.3.0)
+
+## Enhancements
+
+* None
+
+## Fixed
+
+* Fixed the types by removing the `esModuleInterop` from the tsconfig.json. ([#15](https://github.com/realm/react-realm-context/pull/15), since 0.2.0)
+
+## Internals
+
+* None
+
+
 # Release 0.2.0 (2019-02-28)
 
 [Changes since v0.1.0](https://github.com/realm/react-realm-context/compare/v0.1.0...v0.2.0)
