@@ -4,10 +4,11 @@ import { environment, IEnvironmentVersions } from './environment';
 // (technically 2.15.0, but that doesn't have TypeScript types for the connection state listener API).
 // But ... the ealiest version with prebuilt binaries for node 10 is 2.19.0
 // 2.19.0 is also the first version which fixes the types for Realm.Sync.User.login, which the test-harness relies on.
+// but ... 2.20.0 is the first version to add `uploadAllLocalChanges` which some ROS related tests use.
 // 2.22.0 adds support for relative urls when calling `Realm.Sync.User.createConfiguration()` which the ROS related
 // related tests needs.
 const VERSIONS = {
-  realm: [process.env.REALM_OBJECT_SERVER_URL ? '2.22.0' : '2.19.0', 'latest'],
+  realm: [process.env.REALM_OBJECT_SERVER_URL ? '2.22.0' : '2.20.0', 'latest'],
   react: ['16.3.2', 'latest'],
 };
 

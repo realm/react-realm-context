@@ -55,7 +55,7 @@ export const generateRealmConnection = (
       connectionState: Realm.Sync.ConnectionState.Disconnected,
     };
 
-    private syncSession: Realm.Sync.Session;
+    private realm: Realm;
 
     /**
      * Renders the component.
@@ -69,13 +69,13 @@ export const generateRealmConnection = (
     }
 
     private renderContext = (context: IRealmContext) => {
-      if (context && this.syncSession !== context.realm.syncSession) {
+      if (context && this.realm !== context.realm) {
         this.forgetSyncSession();
         // Remember this Realm to avoid adding the notification more than once
-        this.syncSession = context.realm.syncSession;
+        this.realm = context.realm;
         // Add a connection notification listener
-        if (this.syncSession) {
-          this.syncSession.addConnectionNotification(
+        if (this.realm && this.realm.syncSession) {
+          this.realm.syncSession.addConnectionNotification(
             this.onConnectionStateChange,
           );
         }
@@ -89,17 +89,17 @@ export const generateRealmConnection = (
       // Unmounting the Provider component will close the Realm and synchroniously call this callback before
       // the listener is removed from the session. Therefore we need to check if the session has been removed before
       // updating the state
-      if (this.syncSession) {
+      if (this.realm && this.realm.syncSession) {
         this.setState({ connectionState });
       }
     };
 
     private forgetSyncSession() {
-      if (this.syncSession) {
-        this.syncSession.removeConnectionNotification(
+      if (this.realm && this.realm.syncSession) {
+        this.realm.syncSession.removeConnectionNotification(
           this.onConnectionStateChange,
         );
-        delete this.syncSession;
+        delete this.realm;
       }
     }
   }

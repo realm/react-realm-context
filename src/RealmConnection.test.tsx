@@ -31,6 +31,11 @@ describe('RealmConnection', () => {
   afterEach(() => {
     // Delete the default file after the tests
     Realm.deleteFile({});
+    // Unmounting should close the Realm
+    if (tree) {
+      tree.unmount();
+      tree = null;
+    }
   });
 
   it('will remain disconnected for local Realms', () => {
@@ -49,12 +54,8 @@ describe('RealmConnection', () => {
     // Asserting the tree matches the string which was returned
     assert.equal(tree.toJSON(), 'disconnected');
     assert.deepEqual(states, ['disconnected']);
-    // Unmounting should close the Realm
-    tree.unmount();
-    tree = null;
   });
 
-  // Skipping this until we start a ROS server while running the tests
   withROS.it('will be connecting for synced Realms', async function() {
     const states: string[] = [];
     const user = await this.ros.createTestUser();
