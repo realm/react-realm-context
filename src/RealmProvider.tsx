@@ -16,10 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import equal from 'fast-deep-equal';
-import memoizeOne from 'memoize-one';
-import React from 'react';
-import Realm from 'realm';
+import * as equal from 'fast-deep-equal';
+import * as memoizeOne from 'memoize-one';
+import * as React from 'react';
+import * as Realm from 'realm';
 
 import { IRealmContext } from '.';
 

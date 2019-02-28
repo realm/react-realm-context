@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import assert, { rejects } from 'assert';
-import React from 'react';
-import renderer from 'react-test-renderer';
+import * as assert from 'assert';
+import * as React from 'react';
+import * as renderer from 'react-test-renderer';
 
 import { schema } from './test-utils/persons-realm';
 import { withROS } from './test-utils/with-ros';
