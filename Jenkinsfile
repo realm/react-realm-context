@@ -54,8 +54,6 @@ def copyReleaseNotes(versionBefore, versionAfter) {
     file: 'CHANGELOG.md',
     text: "# Release ${versionAfter.substring(1)} (${today})\n\n${releaseNotes}\n\n${changeLog}",
   )
-  // Restore the release notes from the template
-  sh 'cp docs/RELEASENOTES.template.md RELEASENOTES.md'
 }
 
 def testExampleApp(String app) {
@@ -119,6 +117,11 @@ pipeline {
             url: 'git@github.com:realm/react-realm-context.git'
           ]]
         ])
+
+        // Set the email and name used when committing
+        sh 'git config --global user.email "ci@realm.io"'
+        sh 'git config --global user.name "Jenkins CI"'
+        
         // Setting the TAG_NAME env as this is not happening when skipping default checkout.
         script {
           env.TAG_NAME = sh(
@@ -303,6 +306,7 @@ pipeline {
         script {
           copyReleaseNotes(versionBefore, nextVersion)
         }
+
         // Create a draft release on GitHub
         script {
           withCredentials([
@@ -312,9 +316,8 @@ pipeline {
           }
         }
 
-        // Set the email and name used when committing
-        sh 'git config --global user.email "ci@realm.io"'
-        sh 'git config --global user.name "Jenkins CI"'
+        // Restore the release notes from the template
+        sh 'cp docs/RELEASENOTES.template.md RELEASENOTES.md'
 
         // Stage the updates to the files, commit and tag the commit
         sh 'git add package.json package-lock.json CHANGELOG.md RELEASENOTES.md'
