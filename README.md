@@ -228,6 +228,7 @@ for the complete example app.
 
 <details>
 <summary>Example: Using the default RealmProvider, RealmInitializer and RealmQuery in a simple app (click to expand)</summary>
+
 ```javascript
 import React, { Component } from 'react';
 import { RealmProvider } from 'react-realm-context';
