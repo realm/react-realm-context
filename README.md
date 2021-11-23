@@ -304,8 +304,9 @@ const App = () => (
 
 ## Code of Conduct
 
-This project adheres to the Contributor Covenant [code of conduct](https://realm.io/conduct/).
-By participating, you are expected to uphold this code. Please report unacceptable behavior to [info@realm.io](mailto:info+conduct@realm.io).
+This project adheres to the [MongoDB Code of Conduct](https://www.mongodb.com/community-code-of-conduct).
+By participating, you are expected to uphold this code. Please report
+unacceptable behavior to [community-conduct@mongodb.com](mailto:community-conduct@mongodb.com).
 
 ## License
 
@@ -315,4 +316,4 @@ Realm React Context is published under [the Apache 2.0 license](LICENSE).
 
 If you use Realm and are happy with it, all we ask is that you please consider sending out a tweet mentioning [@realm](https://twitter.com/realm) to share your thoughts.
 
-![analytics](https://ga-beacon.appspot.com/UA-50247013-2/react-realm-context/README?pixel)
+<img style="width: 0px; height: 0px;" src="https://3eaz4mshcd.execute-api.us-east-1.amazonaws.com/prod?s=https://github.com/realm/react-realm-context#README.md">
